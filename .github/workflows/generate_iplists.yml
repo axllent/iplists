@@ -1,0 +1,73 @@
+name: Generate IP Lists
+
+on:
+  schedule:
+    # Runs once a day at midnight
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: whois
+          version: 1.0
+
+      - name: Create Applebot IP-List
+        run: curl -s https://search.developer.apple.com/applebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/applebot.ips
+
+      - name: Generate GoogleBot IP-List # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
+        run: curl -s https://developers.google.com/static/search/apis/ipranges/googlebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/googlebot.ips
+  
+      - name: Generate Google Special Crawlers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
+        run: curl -s https://developers.google.com/static/search/apis/ipranges/special-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/googlespecial.ips
+ 
+      - name: Generate Google User-triggered Fetchers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
+        run: curl -s https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/googlefetchers.ips
+ 
+      - name: Generate BingBot IP-List
+        run: curl -s https://www.bing.com/toolbox/bingbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/bingbot.ips
+        
+      - name: Generate FacebookBot IP-List # Source: https://developers.facebook.com/docs/sharing/webmasters/crawler/
+        run: whois -h whois.radb.net -- '-i origin AS32934' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/facebookbot.ips
+     
+      - name: Generate DuckDuckBot IP-List # Source: https://help.duckduckgo.com/duckduckgo-help-pages/results/duckduckbot/
+        run: curl -s https://raw.githubusercontent.com/duckduckgo/duckduckgo-help-pages/master/_docs/results/duckduckbot.md | grep "^\- " | awk '{gsub("-",""); print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/duckduckbot.ips
+      
+      - name: Get UptimeRobot IP List # Source: https://uptimerobot.com/help/locations/
+        run: curl -s https://uptimerobot.com/inc/files/ips/IPv4andIPv6.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/uptimerobot.ips
+
+      - name: Get Pingdom IP List # Source: https://documentation.solarwinds.com/en/success_center/pingdom/content/topics/pingdom-probe-servers-ip-addresses.htm
+        run: |
+          curl -s https://my.pingdom.com/probes/ipv4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/pingdombot.ips
+          curl -s https://my.pingdom.com/probes/ipv6 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/iplists/pingdombot.ips
+      
+      - name: Get Stripe Webhook IP List # Source: https://stripe.com/docs/ips
+        run: curl -s https://stripe.com/files/ips/ips_webhooks.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/stripewebhook.ips
+        
+      - name: Get Cloudflare IP List # Source: https://www.cloudflare.com/ips/
+        run: |
+          curl -s https://www.cloudflare.com/ips-v4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/cloudflare.ips
+          echo "" >> $GITHUB_WORKSPACE/iplists/cloudflare.ips # join lists with new line (will be filtered out later)
+          curl -s https://www.cloudflare.com/ips-v6 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/iplists/cloudflare.ips
+          cat $GITHUB_WORKSPACE/iplists/cloudflare.ips | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/cloudflare.ips.tmp
+          mv $GITHUB_WORKSPACE/iplists/cloudflare.ips.tmp $GITHUB_WORKSPACE/iplists/cloudflare.ips
+
+      - name: Get OpenAI IP List # Source: https://platform.openai.com/docs/gptbot
+        run: |
+          curl -s https://openai.com/searchbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/openai.ips
+          curl -s https://openai.com/chatgpt-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/iplists/openai.ips
+          curl -s https://openai.com/gptbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/iplists/openai.ips
+
+      - name: Get Oracle IP List # https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
+        run: curl -s https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json | jq -r '.regions[] | [.cidrs][] | .[].cidr | select(. != null)' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/oracle.ips
+
+      - name: Commit & push updated IP-Lists into this Repo # Source https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git diff-index --quiet HEAD || git commit -m "Daily auto update of the IP-Lists" && git push
