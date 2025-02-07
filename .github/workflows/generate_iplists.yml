@@ -68,9 +68,6 @@ jobs:
       - name: Get StatusCake IP List # https://www.statuscake.com/kb/knowledge-base/what-are-your-ips/
         run: curl -s https://app.statuscake.com/Workfloor/Locations.php?format=txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/statuscake.txt
 
-      - name: Generate Internet Archive IP-List
-        run: whois -h whois.radb.net -- '-i mnt-by MAINT-7941' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/internet-archive.txt
-
       - name: Generate Twitterbot IP-List # Source: https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards#validate_twitterbot
         run: whois -h whois.radb.net -- '-i origin AS13414' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/twitterbot.txt
 
