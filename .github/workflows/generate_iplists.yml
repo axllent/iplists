@@ -65,6 +65,9 @@ jobs:
       - name: Get Oracle IP List # https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
         run: curl -s https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json | jq -r '.regions[] | [.cidrs][] | .[].cidr | select(. != null)' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/oracle.ips
 
+      - name: Get StatusCake IP List # https://www.statuscake.com/kb/knowledge-base/what-are-your-ips/
+        run: curl -s https://app.statuscake.com/Workfloor/Locations.php?format=txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/iplists/statuscake.ips
+
       - name: Commit & push updated IP-Lists into this Repo # Source https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
         run: |
           git config user.name 'github-actions[bot]'
