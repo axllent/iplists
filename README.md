@@ -1,3 +1,3 @@
-# WAF networks
+# IP Lists
 
-A personal curated list of some networks of various crawlers etc (good and bad!) for use in WAF and/or firewall.
+A personal curated list of IPs belonging to some networks (good and bad!) for use in WAF and/or firewall.
