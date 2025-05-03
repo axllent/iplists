@@ -71,6 +71,9 @@ jobs:
       - name: Generate Twitterbot IP-List # Source: https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards#validate_twitterbot
         run: whois -h whois.radb.net -- '-i origin AS13414' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/twitterbot.txt
 
+      - name: Generate Yahoo IP-List # Source: https://senders.yahooinc.com/mail-proxy-servers/
+        run: curl -s https://geoip.yahoo.net/georeport.csv | awk -F, '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/yahoo.txt
+
       - name: Commit & push updated IP-Lists into this Repo # Source https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
         run: |
           git config user.name 'github-actions[bot]'
