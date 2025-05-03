@@ -26,7 +26,9 @@ jobs:
         run: curl -s https://developers.google.com/static/search/apis/ipranges/special-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/google-special.txt
  
       - name: Generate Google User-triggered Fetchers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
-        run: curl -s https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/google-fetchers.txt
+        run: |
+          curl -s https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/google-fetchers.txt
+          curl -s https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/google-fetchers.txt
  
       - name: Generate BingBot IP-List
         run: curl -s https://www.bing.com/toolbox/bingbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/bingbot.txt
