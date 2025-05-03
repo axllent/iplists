@@ -75,8 +75,9 @@ jobs:
         run: curl -s https://geoip.yahoo.net/georeport.csv | awk -F, '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/yahoo.txt
 
       - name: Generate Iframely IP-List # Source: https://iframely.com/docs/about
-        run: curl -s https://iframely.com/ips-v4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/iframely.txt
-        run: curl -s https://iframely.com/ips-v6 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/iframely.txt
+        run: |
+          curl -s https://iframely.com/ips-v4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/iframely.txt
+          curl -s https://iframely.com/ips-v6 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/iframely.txt
 
       - name: Commit & push updated IP-Lists into this Repo # Source https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
         run: |
