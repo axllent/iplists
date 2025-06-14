@@ -85,6 +85,16 @@ jobs:
           curl -s https://openai.com/gptbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/openai.txt
           [ -s $GITHUB_WORKSPACE/ips/openai.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/openai.txt
 
+      - name: Get PerplexityBot IP List # https://docs.perplexity.ai/guides/bots
+        run: |
+          curl -sL https://www.perplexity.com/perplexitybot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/perplexity-bot.txt
+          [ -s $GITHUB_WORKSPACE/ips/perplexity-bot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/perplexity-bot.txt
+
+      - name: Get Perplexity User IP List # https://docs.perplexity.ai/guides/bots
+        run: |
+          curl -sL https://www.perplexity.com/perplexity-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/perplexity-user.txt
+          [ -s $GITHUB_WORKSPACE/ips/perplexity-user.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/perplexity-user.txt
+
       - name: Get Oracle IP List # https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
         run: |
           curl -s https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json | jq -r '.regions[] | [.cidrs][] | .[].cidr | select(. != null)' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/oracle.txt
