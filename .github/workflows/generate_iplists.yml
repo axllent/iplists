@@ -3,7 +3,7 @@ name: Generate IP Lists
 on:
   schedule:
     # Runs once a day at midnight
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
@@ -26,18 +26,17 @@ jobs:
           curl -sL https://developers.google.com/static/search/apis/ipranges/googlebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/googlebot.txt
           [ -s $GITHUB_WORKSPACE/ips/googlebot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/googlebot.txt
 
-  
       - name: Generate Google Special Crawlers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
         run: |
           curl -sL https://developers.google.com/static/search/apis/ipranges/special-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/google-special.txt
           [ -s $GITHUB_WORKSPACE/ips/google-special.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/google-special.txt
- 
+
       - name: Generate Google User-triggered Fetchers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
         run: |
           curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/google-fetchers.txt
           curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/google-fetchers.txt
           [ -s $GITHUB_WORKSPACE/ips/google-fetchers.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/google-fetchers.txt
- 
+
       - name: Generate BingBot IP-List
         run: |
           curl -sL https://www.bing.com/toolbox/bingbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/bingbot.txt
@@ -52,7 +51,7 @@ jobs:
         run: |
           curl -sL https://raw.githubusercontent.com/duckduckgo/duckduckgo-help-pages/master/_docs/results/duckduckbot.md | grep "^\- " | awk '{gsub("-",""); print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/duckduckbot.txt
           [ -s $GITHUB_WORKSPACE/ips/duckduckbot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/duckduckbot.txt
-      
+
       - name: Get UptimeRobot IP List # Source: https://uptimerobot.com/help/locations/
         run: |
           curl -sL https://uptimerobot.com/inc/files/ips/IPv4andIPv6.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/uptimerobot.txt
@@ -63,12 +62,12 @@ jobs:
           curl -sL https://my.pingdom.com/probes/ipv4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/pingdom.txt
           curl -sL https://my.pingdom.com/probes/ipv6 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/pingdom.txt
           [ -s $GITHUB_WORKSPACE/ips/pingdom.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/pingdom.txt
-      
+
       - name: Get Stripe Webhook IP List # Source: https://stripe.com/docs/ips
         run: |
           curl -sL https://stripe.com/files/ips/ips_webhooks.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/stripe-webhooks.txt
           [ -s $GITHUB_WORKSPACE/ips/stripe-webhooks.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/stripe-webhooks.txt
-        
+
       - name: Get Cloudflare IP List # Source: https://www.cloudflare.com/ips/
         run: |
           curl -sL https://www.cloudflare.com/ips-v4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/cloudflare.txt
@@ -120,6 +119,11 @@ jobs:
           curl -sL https://iframely.com/ips-v4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/iframely.txt
           curl -sL https://iframely.com/ips-v6 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/iframely.txt
           [ -s $GITHUB_WORKSPACE/ips/iframely.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/iframely.txt
+
+      - name: Generate Internet Archive IP-List
+        run: |
+          whois -h whois.radb.net -- '-i origin AS7941' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/internet-archive.txt
+          [ -s $GITHUB_WORKSPACE/ips/internet-archive.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/internet-archive.txt
 
       - name: Commit & push updated IP-Lists into this Repo # Source https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
         run: |
