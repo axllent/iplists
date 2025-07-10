@@ -168,11 +168,12 @@ jobs:
       - name: Generate proxy IP-List # multiple sources
         id: proxies
         run: |
-          curl -sL "https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&proxy_format=protocolipport&format=text" | awk -F"//" '{print $2}' | awk -F":" '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
-          curl -sL https://api.openproxylist.xyz/http.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
-          curl -sL https://api.openproxylist.xyz/https.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
-          curl -sL https://api.openproxylist.xyz/socks4.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
-          curl -sL https://api.openproxylist.xyz/socks5.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
+          curl -sL "https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&proxy_format=protocolipport&format=text" | awk -F"//" '{print $2}' | awk -F":" '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $RUNNER_TEMP/proxies.txt || exit 1 
+          curl -sL https://api.openproxylist.xyz/http.txt | awk -F":" '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $RUNNER_TEMP/proxies.txt || exit 1
+          curl -sL https://api.openproxylist.xyz/https.txt | awk -F":" '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $RUNNER_TEMP/proxies.txt || exit 1
+          curl -sL https://api.openproxylist.xyz/socks4.txt | awk -F":" '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $RUNNER_TEMP/proxies.txt || exit 1
+          curl -sL https://api.openproxylist.xyz/socks5.txt | awk -F":" '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $RUNNER_TEMP/proxies.txt || exit 1
+          cat $RUNNER_TEMP/proxies.txt | sort -u > $GITHUB_WORKSPACE/ips/proxies.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/proxies.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/proxies.txt
         continue-on-error: true
 
