@@ -17,24 +17,28 @@ jobs:
           version: 1.0
 
       - name: Create Applebot IP-List
+        id: applebot
         run: |
           curl -sL https://search.developer.apple.com/applebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/applebot.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/applebot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/applebot.txt
         continue-on-error: true
 
       - name: Generate GoogleBot IP-List # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
+        id: googlebot
         run: |
           curl -sL https://developers.google.com/static/search/apis/ipranges/googlebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/googlebot.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/googlebot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/googlebot.txt
         continue-on-error: true
 
       - name: Generate Google Special Crawlers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
+        id: google-special
         run: |
           curl -sL https://developers.google.com/static/search/apis/ipranges/special-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/google-special.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/google-special.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/google-special.txt
         continue-on-error: true
 
       - name: Generate Google User-triggered Fetchers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
+        id: google-user-triggered
         run: |
           curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/google-fetchers.txt || exit 1
           curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/google-fetchers.txt || exit 1
@@ -42,30 +46,35 @@ jobs:
         continue-on-error: true
 
       - name: Generate BingBot IP-List
+        id: bingbot
         run: |
           curl -sL https://www.bing.com/toolbox/bingbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/bingbot.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/bingbot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/bingbot.txt
         continue-on-error: true
 
       - name: Generate FacebookBot IP-List # Source: https://developers.facebook.com/docs/sharing/webmasters/crawler/
+        id: facebookbot
         run: |
           whois -h whois.radb.net -- '-i origin AS32934' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/facebookbot.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/facebookbot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/facebookbot.txt
         continue-on-error: true
 
       - name: Generate DuckDuckBot IP-List # Source: https://help.duckduckgo.com/duckduckgo-help-pages/results/duckduckbot/
+        id: duckduckbot
         run: |
           curl -sL https://raw.githubusercontent.com/duckduckgo/duckduckgo-help-pages/master/_docs/results/duckduckbot.md | grep "^\- " | awk '{gsub("-",""); print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/duckduckbot.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/duckduckbot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/duckduckbot.txt
         continue-on-error: true
 
       - name: Get UptimeRobot IP List # Source: https://uptimerobot.com/help/locations/
+        id: uptimerobot
         run: |
           curl -sL https://uptimerobot.com/inc/files/ips/IPv4andIPv6.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/uptimerobot.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/uptimerobot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/uptimerobot.txt
         continue-on-error: true
 
       - name: Get Pingdom IP List # Source: https://documentation.solarwinds.com/en/success_center/pingdom/content/topics/pingdom-probe-servers-ip-addresses.htm
+        id: pingdom
         run: |
           curl -sL https://my.pingdom.com/probes/ipv4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/pingdom.txt || exit 1
           curl -sL https://my.pingdom.com/probes/ipv6 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/pingdom.txt || exit 1
@@ -73,12 +82,14 @@ jobs:
         continue-on-error: true
 
       - name: Get Stripe Webhook IP List # Source: https://stripe.com/docs/ips
+        id: stripe-webhooks
         run: |
           curl -sL https://stripe.com/files/ips/ips_webhooks.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/stripe-webhooks.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/stripe-webhooks.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/stripe-webhooks.txt
         continue-on-error: true
 
       - name: Get Cloudflare IP List # Source: https://www.cloudflare.com/ips/
+        id: cloudflare
         run: |
           curl -sL https://www.cloudflare.com/ips-v4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/cloudflare.txt || exit 1
           echo "" >> $GITHUB_WORKSPACE/ips/cloudflare.txt # join lists with new line (will be filtered out later)
@@ -89,6 +100,7 @@ jobs:
         continue-on-error: true
 
       - name: Get OpenAI IP List # Source: https://platform.openai.com/docs/gptbot
+        id: openai
         run: |
           curl -sL https://openai.com/searchbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/openai.txt || exit 1
           curl -sL https://openai.com/chatgpt-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/openai.txt || exit 1
@@ -97,42 +109,49 @@ jobs:
         continue-on-error: true
 
       - name: Get PerplexityBot IP List # https://docs.perplexity.ai/guides/bots
+        id: perplexity-bot
         run: |
           curl -sL https://www.perplexity.com/perplexitybot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/perplexity-bot.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/perplexity-bot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/perplexity-bot.txt
         continue-on-error: true
 
       - name: Get Perplexity User IP List # https://docs.perplexity.ai/guides/bots
+        id: perplexity-user
         run: |
           curl -sL https://www.perplexity.com/perplexity-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/perplexity-user.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/perplexity-user.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/perplexity-user.txt
         continue-on-error: true
 
       - name: Get Oracle IP List # https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
+        id: oracle
         run: |
           curl -sL https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json | jq -r '.regions[] | [.cidrs][] | .[].cidr | select(. != null)' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/oracle.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/oracle.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/oracle.txt
         continue-on-error: true
 
       - name: Get StatusCake IP List # https://www.statuscake.com/kb/knowledge-base/what-are-your-ips/
+        id: statuscake
         run: |
           curl -sL https://app.statuscake.com/Workfloor/Locations.php?format=txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/statuscake.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/statuscake.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/statuscake.txt
         continue-on-error: true
 
       - name: Generate Twitterbot IP-List # Source: https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards#validate_twitterbot
+        id: twitterbot
         run: |
           whois -h whois.radb.net -- '-i origin AS13414' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/twitterbot.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/twitterbot.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/twitterbot.txt
         continue-on-error: true
 
       - name: Generate Yahoo IP-List # Source: https://senders.yahooinc.com/mail-proxy-servers/
+        id: yahoo
         run: |
           curl -sL https://geoip.yahoo.net/georeport.csv | awk -F, '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/yahoo.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/yahoo.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/yahoo.txt
         continue-on-error: true
 
       - name: Generate Iframely IP-List # Source: https://iframely.com/docs/about
+        id: iframely
         run: |
           curl -sL https://iframely.com/ips-v4 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/iframely.txt || exit 1
           curl -sL https://iframely.com/ips-v6 | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/iframely.txt || exit 1
@@ -140,9 +159,21 @@ jobs:
         continue-on-error: true
 
       - name: Generate Internet Archive IP-List
+        id: internet-archive
         run: |
           whois -h whois.radb.net -- '-i origin AS7941' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/internet-archive.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/internet-archive.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/internet-archive.txt
+        continue-on-error: true
+
+      - name: Generate proxy IP-List # multiple sources
+        id: proxies
+        run: |
+          curl -sL "https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&proxy_format=protocolipport&format=text" | awk -F"//" '{print $2}' | awk -F":" '{print $1}' | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh > $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
+          curl -sL https://api.openproxylist.xyz/http.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
+          curl -sL https://api.openproxylist.xyz/https.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
+          curl -sL https://api.openproxylist.xyz/socks4.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
+          curl -sL https://api.openproxylist.xyz/socks5.txt | $GITHUB_WORKSPACE/.github/scripts/clean_ips.sh >> $GITHUB_WORKSPACE/ips/proxies.txt || exit 1 
+          [ -s $GITHUB_WORKSPACE/ips/proxies.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/proxies.txt
         continue-on-error: true
 
       - name: Commit & push updated IP-Lists into this Repo # Source https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
