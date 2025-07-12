@@ -182,6 +182,13 @@ jobs:
           [ -s $GITHUB_WORKSPACE/ips/proxies.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/proxies.txt
         continue-on-error: true
 
+      - name: Generate iCloud Private Relay IP-List # Source: https://blog.cloudflare.com/icloud-private-relay/
+        id: icloud-private-relay
+        run: |
+          curl -sL https://mask-api.icloud.com/egress-ip-ranges.csv | awk -F, '{print $1}' | $GITHUB_WORKSPACE/clean-ips > $GITHUB_WORKSPACE/ips/icloud-private-relay.txt || exit 1
+          [ -s $GITHUB_WORKSPACE/ips/icloud-private-relay.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/icloud-private-relay.txt
+        continue-on-error: true
+
       - name: Commit & push updated IP-Lists into this Repo # Source https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
         run: |
           git config user.name 'github-actions[bot]'
