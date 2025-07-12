@@ -1,3 +1,3 @@
-module github.com/axllent/iplists
+module clean-ips
 
 go 1.23.1
