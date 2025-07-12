@@ -191,6 +191,13 @@ jobs:
           [ -s $GITHUB_WORKSPACE/ips/icloud-private-relay.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/icloud-private-relay.txt
         continue-on-error: true
 
+      - name: Generate AbuseIPDB 100d IP-List # Source: https://github.com/borestad/blocklist-abuseipdb
+        id: abuseipdb-100d
+        run: |
+          curl -sL https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-30d.ipv4 | awk -F" " '{print $1}' | $GITHUB_WORKSPACE/clean-ips | sort -u > $GITHUB_WORKSPACE/ips/abuseipdb-100d.txt || exit 1
+          [ -s $GITHUB_WORKSPACE/ips/abuseipdb-100d.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/abuseipdb-100d.txt
+        continue-on-error: true
+
       - name: Commit & push updated IP-Lists into this Repo # Source https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
         run: |
           git config user.name 'github-actions[bot]'
