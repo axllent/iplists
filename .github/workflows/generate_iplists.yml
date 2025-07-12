@@ -15,7 +15,9 @@ jobs:
         with:
           go-version: stable
           cache: false
+      - name: Compile clean-ip script
         run: go build  -ldflags "-s -w" -o clean-ip .
+
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: whois
