@@ -5,8 +5,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"net"
 	"os"
 	"regexp"
+	"strings"
 )
 
 func main() {
@@ -15,7 +17,7 @@ func main() {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		if ipMatch.MatchString(line) {
+		if ipMatch.MatchString(line) && valid(line) {
 			fmt.Println(line)
 		}
 	}
@@ -24,4 +26,27 @@ func main() {
 		fmt.Fprintln(os.Stderr, "reading standard input:", err)
 		os.Exit(1)
 	}
+}
+
+// valid checks if the given IP or CIDR is valid and not a private address.
+func valid(ip string) bool {
+	if strings.Contains(ip, "/") {
+		// parse as a CIDR notation
+		parsedIP, _, err := net.ParseCIDR(ip)
+		if err != nil {
+			return false
+		}
+
+		if parsedIP == nil || parsedIP.IsPrivate() {
+			return false
+		}
+	} else {
+		// Check if it's a CIDR notation
+		parsedIP := net.ParseIP(ip)
+		if parsedIP == nil || parsedIP.IsPrivate() {
+			return false
+		}
+	}
+
+	return true
 }
