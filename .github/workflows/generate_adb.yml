@@ -20,10 +20,10 @@ jobs:
 
       - name: Create ADB IP-List
         id: adb
-        env:
-          ADB_KEY: "${{ secrets.ADB_KEY }}"
+        # env:
+        #   ADB_KEY: "${{ secrets.ADB_KEY }}"
         run: |
-          $GITHUB_WORKSPACE/iplists adb $GITHUB_WORKSPACE/db/adb.json $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt || exit 1
+          ADB_KEY="${{ secrets.ADB_KEY }}" $GITHUB_WORKSPACE/iplists adb $GITHUB_WORKSPACE/db/adb.json $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt
 
       - name: Commit & push updated IP-List
