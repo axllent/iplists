@@ -2,8 +2,8 @@ name: Generate ADB IP List
 
 on:
   schedule:
-    # Runs every 2 hours
-    - cron: "0 0/2 * * *"
+    # Runs every hour
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -31,4 +31,4 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add .
-          git diff-index --quiet HEAD || git commit -m "Auto update of the ADB IP-List" && git push
+          git diff-index --quiet HEAD || git commit -m "Hourly auto update of ADB list" && git push
