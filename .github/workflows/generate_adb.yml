@@ -25,7 +25,6 @@ jobs:
         run: |
           $GITHUB_WORKSPACE/iplists adb $GITHUB_WORKSPACE/db/adb.json $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt || exit 1
           [ -s $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt
-        continue-on-error: true
 
       - name: Commit & push updated IP-List
         run: |
