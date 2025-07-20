@@ -1,0 +1,33 @@
+name: Generate ADB IP List
+
+on:
+  schedule:
+    # Runs every 2 hours
+    - cron: "0 0/2 * * *"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+      - name: Compile CLI
+        run: go build  -ldflags "-s -w" .
+
+      - name: Create ADB IP-List
+        id: adb
+        run: |
+          $GITHUB_WORKSPACE/iplists adb $GITHUB_WORKSPACE/db/adb.json $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt || exit 1
+          [ -s $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt
+        continue-on-error: true
+
+      - name: Commit & push updated IP-List
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git diff-index --quiet HEAD || git commit -m "Auto update of the ADB IP-List" && git push
