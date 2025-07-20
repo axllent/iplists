@@ -191,6 +191,15 @@ jobs:
           [ -s $GITHUB_WORKSPACE/ips/icloud-private-relay.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/icloud-private-relay.txt
         continue-on-error: true
 
+      # VPN must come after iCloud Private Relay as those are then removed from this list
+      - name: Generate VPN IP-List # Source: https://github.com/X4BNet/lists_vpn
+        id: vpn
+        run: |
+          curl -sL https://raw.githubusercontent.com/X4BNet/lists_vpn/refs/heads/main/output/vpn/ipv4.txt | ./iplists clean | sort -u > ips/vpn.txt || exit 1
+          ./iplists prune ips/vpn.txt ips/icloud-private-relay.txt || exit 1
+          [ -s ips/vpn.txt ] || git checkout -- ips/vpn.txt
+        continue-on-error: true
+
       - name: Generate AbuseIPDB 100d IP-List # Source: https://github.com/borestad/blocklist-abuseipdb
         id: abuseipdb-100d
         run: |
