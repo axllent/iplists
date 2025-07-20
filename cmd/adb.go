@@ -3,7 +3,9 @@ package cmd
 import (
 	"fmt"
 	"iplists/cmd/internal/lib"
+	"math/rand"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -24,11 +26,15 @@ and retain IPs listed within the last 100 days.
 
 ADB_KEY environment variable must be set with your AbuseIPDb API key.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		key, set := os.LookupEnv("ADB_KEY")
-		if !set || key == "" {
+		keys, set := os.LookupEnv("ADB_KEY")
+		if !set || keys == "" {
 			fmt.Fprintln(os.Stderr, "ADB_KEY environment variable must be set to your AbuseIPDb API key")
 			os.Exit(1)
 		}
+
+		parts := strings.Split(keys, ",")
+		randomIndex := rand.Intn(len(parts)) // generate a random int
+		key := parts[randomIndex]
 
 		if err := lib.UpdateADBdb(key, args[0], adbDays); err != nil {
 			fmt.Fprintf(os.Stderr, "Error updating AbuseIPDb database: %v\n", err)
