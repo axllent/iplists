@@ -23,8 +23,8 @@ jobs:
         env:
           ADB_KEY: "${{ secrets.ADB_KEY }}"
         run: |
-          $GITHUB_WORKSPACE/iplists adb $GITHUB_WORKSPACE/db/adb.json $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt || exit 1
-          [ -s $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt ] || git checkout -- $GITHUB_WORKSPACE/ips/abuseipdb-dont-use.txt
+          ./iplists adb db/adb.json ips/abuseipdb-dont-use.txt || exit 1
+          [ -s ips/abuseipdb-dont-use.txt ] || git checkout -- ips/abuseipdb-dont-use.txt
 
       - name: Commit & push updated IP-List
         run: |
