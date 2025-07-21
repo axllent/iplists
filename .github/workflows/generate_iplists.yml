@@ -8,6 +8,7 @@ on:
 
 jobs:
   generate:
+    name: Generate IP Lists
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,14 +24,14 @@ jobs:
           packages: whois
           version: 1.0
 
-      - name: Create Applebot IP-List
+      - name: Create Applebot ip-list
         id: applebot
         run: |
           curl -sL https://search.developer.apple.com/applebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/applebot.txt || exit 1
           [ -s ips/applebot.txt ] || git checkout -- ips/applebot.txt
         continue-on-error: true
 
-      - name: Generate GoogleBot IP-List # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
+      - name: Generate GoogleBot ip-list # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
         id: googlebot
         run: |
           curl -sL https://developers.google.com/static/search/apis/ipranges/googlebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/googlebot.txt || exit 1
@@ -52,21 +53,21 @@ jobs:
           [ -s ips/google-fetchers.txt ] || git checkout -- ips/google-fetchers.txt
         continue-on-error: true
 
-      - name: Generate BingBot IP-List
+      - name: Generate BingBot ip-list
         id: bingbot
         run: |
           curl -sL https://www.bing.com/toolbox/bingbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/bingbot.txt || exit 1
           [ -s ips/bingbot.txt ] || git checkout -- ips/bingbot.txt
         continue-on-error: true
 
-      - name: Generate FacebookBot IP-List # Source: https://developers.facebook.com/docs/sharing/webmasters/crawler/
+      - name: Generate FacebookBot ip-list # Source: https://developers.facebook.com/docs/sharing/webmasters/crawler/
         id: facebookbot
         run: |
           whois -h whois.radb.net -- '-i origin AS32934' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > ips/facebookbot.txt || exit 1
           [ -s ips/facebookbot.txt ] || git checkout -- ips/facebookbot.txt
         continue-on-error: true
 
-      - name: Generate DuckDuckBot IP-List # Source: https://help.duckduckgo.com/duckduckgo-help-pages/results/duckduckbot/
+      - name: Generate DuckDuckBot ip-list # Source: https://help.duckduckgo.com/duckduckgo-help-pages/results/duckduckbot/
         id: duckduckbot
         run: |
           curl -sL https://raw.githubusercontent.com/duckduckgo/duckduckgo-help-pages/master/_docs/results/duckduckbot.md | grep "^\- " | awk '{gsub("-",""); print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > ips/duckduckbot.txt || exit 1
@@ -143,21 +144,21 @@ jobs:
           [ -s ips/statuscake.txt ] || git checkout -- ips/statuscake.txt
         continue-on-error: true
 
-      - name: Generate Twitterbot IP-List # Source: https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards#validate_twitterbot
+      - name: Generate Twitterbot ip-list # Source: https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards#validate_twitterbot
         id: twitterbot
         run: |
           whois -h whois.radb.net -- '-i origin AS13414' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > ips/twitterbot.txt || exit 1
           [ -s ips/twitterbot.txt ] || git checkout -- ips/twitterbot.txt
         continue-on-error: true
 
-      - name: Generate Yahoo IP-List # Source: https://senders.yahooinc.com/mail-proxy-servers/
+      - name: Generate Yahoo ip-list # Source: https://senders.yahooinc.com/mail-proxy-servers/
         id: yahoo
         run: |
           curl -sL https://geoip.yahoo.net/georeport.csv | awk -F, '{print $1}' | ./iplists clean > ips/yahoo.txt || exit 1
           [ -s ips/yahoo.txt ] || git checkout -- ips/yahoo.txt
         continue-on-error: true
 
-      - name: Generate Iframely IP-List # Source: https://iframely.com/docs/about
+      - name: Generate Iframely ip-list # Source: https://iframely.com/docs/about
         id: iframely
         run: |
           curl -sL https://iframely.com/ips-v4 | ./iplists clean > ips/iframely.txt || exit 1
@@ -165,14 +166,38 @@ jobs:
           [ -s ips/iframely.txt ] || git checkout -- ips/iframely.txt
         continue-on-error: true
 
-      - name: Generate Internet Archive IP-List
+      - name: Generate Internet Archive ip-list
         id: internet-archive
         run: |
           whois -h whois.radb.net -- '-i origin AS7941' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > ips/internet-archive.txt || exit 1
           [ -s ips/internet-archive.txt ] || git checkout -- ips/internet-archive.txt
         continue-on-error: true
 
-      - name: Generate proxy IP-List # multiple sources
+      - name: Generate AbuseIPDB 100d ip-list # Source: https://github.com/borestad/blocklist-abuseipdb
+        id: abuseipdb-100d
+        run: |
+          curl -sL https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-30d.ipv4 | awk -F" " '{print $1}' | ./iplists clean | sort -u > ips/abuseipdb-100d.txt || exit 1
+          [ -s ips/abuseipdb-100d.txt ] || git checkout -- ips/abuseipdb-100d.txt
+        continue-on-error: true
+
+      - name: Generate iCloud Private Relay ip-list # Source: https://blog.cloudflare.com/icloud-private-relay/
+        id: icloud-private-relay
+        run: |
+          curl -sL https://mask-api.icloud.com/egress-ip-ranges.csv | awk -F, '{print $1}' | ./iplists clean | sort -u > ips/icloud-private-relay.txt || exit 1
+          [ -s ips/icloud-private-relay.txt ] || git checkout -- ips/icloud-private-relay.txt
+        continue-on-error: true
+
+      # VPN must come after iCloud Private Relay as those are then removed from this list
+      - name: Generate VPN ip-list # Source: https://github.com/X4BNet/lists_vpn
+        id: vpn
+        run: |
+          curl -sL https://raw.githubusercontent.com/X4BNet/lists_vpn/refs/heads/main/output/vpn/ipv4.txt | ./iplists clean | sort -u > ips/vpn.txt || exit 1
+          ./iplists prune ips/vpn.txt ips/icloud-private-relay.txt || exit 1
+          [ -s ips/vpn.txt ] || git checkout -- ips/vpn.txt
+        continue-on-error: true
+
+      # Proxies get pruned with VPN list
+      - name: Generate proxy ip-list # multiple sources
         id: proxies
         run: |
           curl -sL "https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&proxy_format=protocolipport&format=text" | awk -F"//" '{print $2}' | awk -F":" '{print $1}' | ./iplists clean > $RUNNER_TEMP/proxies.txt || exit 1 
@@ -181,33 +206,11 @@ jobs:
           curl -sL https://api.openproxylist.xyz/socks4.txt | awk -F":" '{print $1}' | ./iplists clean >> $RUNNER_TEMP/proxies.txt || exit 1
           curl -sL https://api.openproxylist.xyz/socks5.txt | awk -F":" '{print $1}' | ./iplists clean >> $RUNNER_TEMP/proxies.txt || exit 1
           cat $RUNNER_TEMP/proxies.txt | sort -u > ips/proxies.txt || exit 1
+          ./iplists prune ips/proxies.txt ips/vpn.txt || exit 1
           [ -s ips/proxies.txt ] || git checkout -- ips/proxies.txt
         continue-on-error: true
 
-      - name: Generate iCloud Private Relay IP-List # Source: https://blog.cloudflare.com/icloud-private-relay/
-        id: icloud-private-relay
-        run: |
-          curl -sL https://mask-api.icloud.com/egress-ip-ranges.csv | awk -F, '{print $1}' | ./iplists clean | sort -u > ips/icloud-private-relay.txt || exit 1
-          [ -s ips/icloud-private-relay.txt ] || git checkout -- ips/icloud-private-relay.txt
-        continue-on-error: true
-
-      # VPN must come after iCloud Private Relay as those are then removed from this list
-      - name: Generate VPN IP-List # Source: https://github.com/X4BNet/lists_vpn
-        id: vpn
-        run: |
-          curl -sL https://raw.githubusercontent.com/X4BNet/lists_vpn/refs/heads/main/output/vpn/ipv4.txt | ./iplists clean | sort -u > ips/vpn.txt || exit 1
-          ./iplists prune ips/vpn.txt ips/icloud-private-relay.txt || exit 1
-          [ -s ips/vpn.txt ] || git checkout -- ips/vpn.txt
-        continue-on-error: true
-
-      - name: Generate AbuseIPDB 100d IP-List # Source: https://github.com/borestad/blocklist-abuseipdb
-        id: abuseipdb-100d
-        run: |
-          curl -sL https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-30d.ipv4 | awk -F" " '{print $1}' | ./iplists clean | sort -u > ips/abuseipdb-100d.txt || exit 1
-          [ -s ips/abuseipdb-100d.txt ] || git checkout -- ips/abuseipdb-100d.txt
-        continue-on-error: true
-
-      - name: Commit & push updated IP-Lists
+      - name: Commit & push updated ip-lists
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
