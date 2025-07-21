@@ -116,7 +116,7 @@ which are present in "with_list_list".`,
 			}
 		}
 
-		fmt.Printf("Pruned %d entries from %s\n", removed, args[0])
+		fmt.Printf("Pruned %d addresses from %s with %s\n", removed, args[0], args[1])
 
 	},
 }
