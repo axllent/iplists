@@ -116,7 +116,7 @@ which are present in "with_list_list".`,
 			}
 		}
 
-		fmt.Printf("Pruned %d addresses from %s with %s\n", removed, args[0], args[1])
+		fmt.Printf("Removed %d duplicate addresses in %s also found in %s\n", removed, args[0], args[1])
 
 	},
 }
