@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"iplists/cmd/internal/lib"
+	"iplists/cmd/internal/adb"
 	"math/rand"
 	"os"
 	"strings"
@@ -36,12 +36,12 @@ ADB_KEY environment variable must be set with your AbuseIPDb API key.`,
 		randomIndex := rand.Intn(len(parts)) // generate a random int
 		key := parts[randomIndex]
 
-		if err := lib.UpdateADBdb(key, args[0], adbDays); err != nil {
+		if err := adb.UpdateADBdb(key, args[0], adbDays); err != nil {
 			fmt.Fprintf(os.Stderr, "Error updating AbuseIPDb database: %v\n", err)
 			os.Exit(1)
 		}
 
-		entries := lib.LoadExistingADBs(args[0])
+		entries := adb.LoadExistingADBs(args[0])
 		if len(entries) == 0 {
 			fmt.Println("No valid entries found in the local database.")
 			return
