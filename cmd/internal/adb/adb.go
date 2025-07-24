@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-// ADBEntry represents an entry in the AbuseIPDb database.
-type ADBEntry struct {
+// Entry represents an entry in the AbuseIPDb database.
+type Entry struct {
 	IP       string `json:"ip"`
 	LastSeen string `json:"last_seen"`
 }
@@ -56,7 +56,7 @@ func UpdateADBdb(key, database string, days int) error {
 	// load all
 	db := LoadExistingADBs(database, -1)
 	// build a map for quick lookup
-	existingIPs := make(map[string]ADBEntry)
+	existingIPs := make(map[string]Entry)
 	for _, entry := range db {
 		existingIPs[entry.IP] = entry
 	}
@@ -71,7 +71,7 @@ func UpdateADBdb(key, database string, days int) error {
 			existingIPs[ip] = entry
 		} else {
 			// If the IP does not exist, add it with the current time
-			existingIPs[ip] = ADBEntry{
+			existingIPs[ip] = Entry{
 				IP:       ip,
 				LastSeen: now,
 			}
@@ -103,7 +103,7 @@ func UpdateADBdb(key, database string, days int) error {
 	sort.Strings(keys)
 
 	// build the updated list in order of IP addresses
-	updatedEntries := make([]ADBEntry, 0, len(existingIPs))
+	updatedEntries := make([]Entry, 0, len(existingIPs))
 	for _, k := range keys {
 		updatedEntries = append(updatedEntries, existingIPs[k])
 	}
@@ -121,22 +121,22 @@ func UpdateADBdb(key, database string, days int) error {
 		return fmt.Errorf("failed to write to database file: %w", err)
 	}
 
-	fmt.Printf("[AbuseIPDB] Updated database with %d new entries, removed %d expired entries, total (%d entries).\n", added, removed, len(existingIPs))
+	fmt.Printf("Updated database with %d new entries, removed %d expired entries, total (%d entries).\n", added, removed, len(existingIPs))
 
 	return nil
 }
 
 // LoadExistingADBs reads the existing IPs from the database file
 // returning entries newer than N days.
-func LoadExistingADBs(database string, days int) []ADBEntry {
-	entries := []ADBEntry{}
+func LoadExistingADBs(database string, days int) []Entry {
+	entries := []Entry{}
 	b, err := os.ReadFile(path.Clean(database))
 	if err != nil {
 		return entries
 	}
 
 	if err := json.Unmarshal(b, &entries); err != nil {
-		fmt.Printf("[AbuseIPDB] %s\n", err.Error())
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
@@ -149,7 +149,7 @@ func LoadExistingADBs(database string, days int) []ADBEntry {
 
 	cutoff := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 
-	returnEntries := []ADBEntry{}
+	returnEntries := []Entry{}
 
 	for _, entry := range entries {
 		t, err := time.Parse(`2006-01-02`, entry.LastSeen)
