@@ -16,14 +16,18 @@ jobs:
           go-version: stable
           cache: true
       - name: Compile CLI
-        run: go build  -ldflags "-s -w" .
+        run: go build -ldflags "-s -w" .
 
-      - name: Create ADB IP-List
-        id: adb
+      - name: Get latest ADB IPs
         env:
           ADB_KEY: "${{ secrets.ADB_KEY }}"
         run: |
           ./iplists adb fetch db/adb.json || exit 1
+
+      - name: Generate ADB IP list
+        env:
+          ADB_KEY: "${{ secrets.ADB_KEY }}"
+        run: |
           ./iplists adb build db/adb.json ips/abuseipdb-dont-use.txt || exit 1
           [ -s ips/abuseipdb-dont-use.txt ] || git checkout -- ips/abuseipdb-dont-use.txt
 
