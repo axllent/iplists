@@ -8,6 +8,7 @@ import (
 	"iplists/cmd/internal/lib"
 	"net/http"
 	"os"
+	"path"
 	"sort"
 	"time"
 )
@@ -52,7 +53,8 @@ func UpdateADBdb(key, database string, days int) error {
 		return fmt.Errorf("no valid IPs found in the response")
 	}
 
-	db := LoadExistingADBs(database)
+	// load all
+	db := LoadExistingADBs(database, -1)
 	// build a map for quick lookup
 	existingIPs := make(map[string]ADBEntry)
 	for _, entry := range db {
@@ -84,7 +86,6 @@ func UpdateADBdb(key, database string, days int) error {
 		t, err := time.Parse(`2006-01-02`, entry.LastSeen)
 		if err != nil {
 			fmt.Println(err)
-			fmt.Println("")
 			continue
 		}
 
@@ -108,7 +109,7 @@ func UpdateADBdb(key, database string, days int) error {
 	}
 
 	// write the updated entries to the database file
-	file, err := os.Create(database)
+	file, err := os.Create(path.Clean(database))
 	if err != nil {
 		return fmt.Errorf("failed to create database file: %w", err)
 	}
@@ -125,17 +126,42 @@ func UpdateADBdb(key, database string, days int) error {
 	return nil
 }
 
-// LoadExistingADBs reads the existing IPs from the database file.
-func LoadExistingADBs(database string) []ADBEntry {
+// LoadExistingADBs reads the existing IPs from the database file
+// returning entries newer than N days.
+func LoadExistingADBs(database string, days int) []ADBEntry {
 	entries := []ADBEntry{}
-	b, err := os.ReadFile(database)
+	b, err := os.ReadFile(path.Clean(database))
 	if err != nil {
 		return entries
 	}
 
 	if err := json.Unmarshal(b, &entries); err != nil {
 		fmt.Printf("[AbuseIPDB] %s\n", err.Error())
+		os.Exit(1)
 	}
 
-	return entries
+	// return all
+	if days <= 0 {
+		return entries
+	}
+
+	t := time.Now().Add(-time.Hour * 24 * time.Duration(days))
+
+	cutoff := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+
+	returnEntries := []ADBEntry{}
+
+	for _, entry := range entries {
+		t, err := time.Parse(`2006-01-02`, entry.LastSeen)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		if !t.Before(cutoff) {
+			returnEntries = append(returnEntries, entry)
+		}
+	}
+
+	return returnEntries
 }
