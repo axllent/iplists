@@ -13,14 +13,14 @@ import (
 	"time"
 )
 
-// Entry represents an entry in the AbuseIPDb database.
+// Entry represents an entry in the AbuseIPDb cache.
 type Entry struct {
 	IP       string `json:"ip"`
 	LastSeen string `json:"last_seen"`
 }
 
-// UpdateADBdb fetches the AbuseIPDb blacklist and updates the local database.
-func UpdateADBdb(key, database string, days int) error {
+// UpdateADBCache fetches the AbuseIPDb blacklist and updates the local cache.
+func UpdateADBCache(key, cache string, days int) error {
 	req, _ := http.NewRequest("GET", "https://api.abuseipdb.com/api/v2/blacklist", nil)
 	req.Header.Set("Key", key)
 	req.Header.Set("Accept", "text/plain")
@@ -54,7 +54,7 @@ func UpdateADBdb(key, database string, days int) error {
 	}
 
 	// load all
-	db := LoadExistingADBs(database, -1)
+	db := LoadADBCache(cache, -1)
 	// build a map for quick lookup
 	existingIPs := make(map[string]Entry)
 	for _, entry := range db {
@@ -108,21 +108,21 @@ func UpdateADBdb(key, database string, days int) error {
 		updatedEntries = append(updatedEntries, existingIPs[k])
 	}
 
-	// write the updated entries to the database file
-	file, err := os.Create(path.Clean(database))
+	// write the updated entries to the cache file
+	file, err := os.Create(path.Clean(cache))
 	if err != nil {
-		return fmt.Errorf("failed to create database file: %w", err)
+		return fmt.Errorf("failed to create cache file: %w", err)
 	}
 	defer func() { _ = file.Close() }()
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ") // for pretty printing
 	if err := encoder.Encode(updatedEntries); err != nil {
-		return fmt.Errorf("failed to write to database file: %w", err)
+		return fmt.Errorf("failed to write to cache file: %w", err)
 	}
 
 	fmt.Printf(
-		"Updated database with %s new IPs, removed %s expired IPs, total %s IPs active in the last %d days.\n",
+		"Updated cache with %s new IPs, removed %s expired IPs, total %s IPs active in the last %d days.\n",
 		lib.NumberFormat(added),
 		lib.NumberFormat(removed),
 		lib.NumberFormat(len(existingIPs)),
@@ -132,11 +132,11 @@ func UpdateADBdb(key, database string, days int) error {
 	return nil
 }
 
-// LoadExistingADBs reads the existing IPs from the database file
+// LoadADBCache reads the existing IPs from the cache file
 // returning entries newer than N days.
-func LoadExistingADBs(database string, days int) []Entry {
+func LoadADBCache(cache string, days int) []Entry {
 	entries := []Entry{}
-	b, err := os.ReadFile(path.Clean(database))
+	b, err := os.ReadFile(path.Clean(cache))
 	if err != nil {
 		return entries
 	}
