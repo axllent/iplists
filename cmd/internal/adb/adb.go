@@ -122,7 +122,7 @@ func UpdateADBdb(key, database string, days int) error {
 	}
 
 	fmt.Printf(
-		"Updated database with %s new IPs, removed %s expired IPs, total %s IPs from the last %d days.\n",
+		"Updated database with %s new IPs, removed %s expired IPs, total %s IPs active in the last %d days.\n",
 		lib.NumberFormat(added),
 		lib.NumberFormat(removed),
 		lib.NumberFormat(len(existingIPs)),
