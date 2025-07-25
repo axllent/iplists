@@ -15,21 +15,21 @@ var adbDays = 30
 var adbBuildCmd = &cobra.Command{
 	Use:   "build <db-file> <output-file>",
 	Args:  cobra.ExactArgs(2),
-	Short: "Build a list of IPs from AbuseIPDb database",
-	Long: `This command builds a list of IPs from the AbuseIPDb database.
+	Short: "Build a list of IPs from AbuseIPDb cache",
+	Long: `This command builds a list of IPs from the AbuseIPDb cache.
 	
-It will read the local database and output a list of IPs that are currently listed,
-active in the last N days.`,
+It will read the local cache and output a list of IPs that are currently listed,
+active in the last N days (see flags).`,
 	Run: func(cmd *cobra.Command, args []string) {
-		entries := adb.LoadExistingADBs(args[0], adbDays)
+		entries := adb.LoadADBCache(args[0], adbDays)
 		if len(entries) == 0 {
-			fmt.Println("No valid entries found in the local database.")
+			fmt.Println("No valid entries found in the local cache.")
 			return
 		}
 
 		f, err := os.OpenFile(args[1], os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error opening output file %s: %v\n", args[1], err)
+			fmt.Fprintf(os.Stderr, "Error opening list file %s: %v\n", args[1], err)
 			os.Exit(1)
 		}
 		defer func() { _ = f.Close() }()
@@ -37,7 +37,7 @@ active in the last N days.`,
 		ips := 0
 		for _, entry := range entries {
 			if _, err := fmt.Fprintln(f, entry.IP); err != nil {
-				fmt.Fprintf(os.Stderr, "Error writing to output file %s: %v\n", args[1], err)
+				fmt.Fprintf(os.Stderr, "Error writing to list file %s: %v\n", args[1], err)
 				os.Exit(1)
 			}
 			ips++
