@@ -47,7 +47,7 @@ active in the last N days.`,
 			return
 		}
 
-		fmt.Printf("Wrote %d entries active in the last %d days to %s\n", ips, adbDays, args[1])
+		fmt.Printf("Wrote %d ips active in the last %d days to %s\n", ips, adbDays, args[1])
 	},
 }
 
