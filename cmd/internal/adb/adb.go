@@ -121,7 +121,13 @@ func UpdateADBdb(key, database string, days int) error {
 		return fmt.Errorf("failed to write to database file: %w", err)
 	}
 
-	fmt.Printf("Updated database with %d new IPs, removed %d expired IPs, total %d IPs.\n", added, removed, len(existingIPs))
+	fmt.Printf(
+		"Updated database with %s new IPs, removed %s expired IPs, total %s IPs from the last %d days.\n",
+		lib.NumberFormat(added),
+		lib.NumberFormat(removed),
+		lib.NumberFormat(len(existingIPs)),
+		days,
+	)
 
 	return nil
 }

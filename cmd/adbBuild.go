@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"iplists/cmd/internal/adb"
+	"iplists/cmd/internal/lib"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -43,11 +44,11 @@ active in the last N days.`,
 		}
 
 		if adbDays <= 0 {
-			fmt.Printf("Wrote %d entries to %s\n", ips, args[1])
+			fmt.Printf("Wrote %s entries to %s\n", lib.NumberFormat(ips), args[1])
 			return
 		}
 
-		fmt.Printf("Wrote %d ips active in the last %d days to %s\n", ips, adbDays, args[1])
+		fmt.Printf("Wrote %s ips active in the last %d days to %s\n", lib.NumberFormat(ips), adbDays, args[1])
 	},
 }
 

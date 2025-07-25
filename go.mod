@@ -2,7 +2,10 @@ module iplists
 
 go 1.23.1
 
-require github.com/spf13/cobra v1.9.1
+require (
+	github.com/spf13/cobra v1.9.1
+	golang.org/x/text v0.27.0
+)
 
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
