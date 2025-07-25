@@ -4,6 +4,9 @@ package lib
 import (
 	"net"
 	"strings"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 // ValidAddress checks if the given IP or CIDR is valid and not a private address.
@@ -27,4 +30,10 @@ func ValidAddress(ip string) bool {
 	}
 
 	return true
+}
+
+// NumberFormat formats a number using the English locale.
+func NumberFormat(d int) string {
+	p := message.NewPrinter(language.English)
+	return p.Sprintf("%d", d)
 }
