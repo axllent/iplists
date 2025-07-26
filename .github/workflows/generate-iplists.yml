@@ -216,7 +216,7 @@ jobs:
           curl -sL https://raw.githubusercontent.com/X4BNet/lists_vpn/refs/heads/main/output/vpn/ipv4.txt | ./iplists clean | sort -u > ips/vpns.txt || exit 1
           ./iplists prune ips/vpns.txt ips/icloud-private-relay.txt || exit 1
           ./iplists aggregate ips/vpns.txt -w || exit 1
-          [ -s ips/vpns.txt ] || git checkout -- ips/vpn.txt
+          [ -s ips/vpns.txt ] || git checkout -- ips/vpns.txt
         continue-on-error: true
 
       # Proxies get pruned with VPN list
