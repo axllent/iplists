@@ -234,6 +234,14 @@ jobs:
           [ -s lists/proxies.txt ] || git checkout -- lists/proxies.txt
         continue-on-error: true
 
+      - name: Generate Tor exit nodes ip-list # Source: https://github.com/okinjp/tor_ips
+        id: tor
+        run: |
+          curl -sL https://raw.githubusercontent.com/okinjp/tor_ips/refs/heads/main/tor-ips.txt | ./iplists clean | sort -u > lists/tor-exit-nodes.txt || exit 1
+          ./iplists aggregate lists/tor-exit-nodes.txt -w || exit 1
+          [ -s lists/tor-exit-nodes.txt ] || git checkout -- lists/tor-exit-nodes.txt
+        continue-on-error: true
+
       - name: Commit & push updated ip-lists
         run: |
           git config user.name 'github-actions[bot]'
