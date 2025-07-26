@@ -28,6 +28,7 @@ jobs:
         id: applebot
         run: |
           curl -sL https://search.developer.apple.com/applebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/applebot.txt || exit 1
+          ./iplists aggregate ips/applebot.txt -w || exit 1
           [ -s ips/applebot.txt ] || git checkout -- ips/applebot.txt
         continue-on-error: true
 
@@ -35,6 +36,7 @@ jobs:
         id: googlebot
         run: |
           curl -sL https://developers.google.com/static/search/apis/ipranges/googlebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/googlebot.txt || exit 1
+          ./iplists aggregate ips/googlebot.txt -w || exit 1
           [ -s ips/googlebot.txt ] || git checkout -- ips/googlebot.txt
         continue-on-error: true
 
@@ -42,6 +44,7 @@ jobs:
         id: google-special
         run: |
           curl -sL https://developers.google.com/static/search/apis/ipranges/special-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/google-special.txt || exit 1
+          ./iplists aggregate ips/google-special.txt -w || exit 1
           [ -s ips/google-special.txt ] || git checkout -- ips/google-special.txt
         continue-on-error: true
 
@@ -50,6 +53,7 @@ jobs:
         run: |
           curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/google-fetchers.txt || exit 1
           curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> ips/google-fetchers.txt || exit 1
+          ./iplists aggregate ips/google-fetchers.txt -w || exit 1
           [ -s ips/google-fetchers.txt ] || git checkout -- ips/google-fetchers.txt
         continue-on-error: true
 
@@ -57,6 +61,7 @@ jobs:
         id: bingbot
         run: |
           curl -sL https://www.bing.com/toolbox/bingbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/bingbot.txt || exit 1
+          ./iplists aggregate ips/bingbot.txt -w || exit 1
           [ -s ips/bingbot.txt ] || git checkout -- ips/bingbot.txt
         continue-on-error: true
 
@@ -64,6 +69,7 @@ jobs:
         id: facebookbot
         run: |
           whois -h whois.radb.net -- '-i origin AS32934' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > ips/facebookbot.txt || exit 1
+          ./iplists aggregate ips/facebookbot.txt -w || exit 1
           [ -s ips/facebookbot.txt ] || git checkout -- ips/facebookbot.txt
         continue-on-error: true
 
@@ -71,6 +77,7 @@ jobs:
         id: duckduckbot
         run: |
           curl -sL https://raw.githubusercontent.com/duckduckgo/duckduckgo-help-pages/master/_docs/results/duckduckbot.md | grep "^\- " | awk '{gsub("-",""); print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > ips/duckduckbot.txt || exit 1
+          ./iplists aggregate ips/duckduckbot.txt -w || exit 1
           [ -s ips/duckduckbot.txt ] || git checkout -- ips/duckduckbot.txt
         continue-on-error: true
 
@@ -78,6 +85,7 @@ jobs:
         id: uptimerobot
         run: |
           curl -sL https://uptimerobot.com/inc/files/ips/IPv4andIPv6.txt | ./iplists clean > ips/uptimerobot.txt || exit 1
+          ./iplists aggregate ips/uptimerobot.txt -w || exit 1
           [ -s ips/uptimerobot.txt ] || git checkout -- ips/uptimerobot.txt
         continue-on-error: true
 
@@ -86,6 +94,7 @@ jobs:
         run: |
           curl -sL https://my.pingdom.com/probes/ipv4 | ./iplists clean > ips/pingdom.txt || exit 1
           curl -sL https://my.pingdom.com/probes/ipv6 | ./iplists clean >> ips/pingdom.txt || exit 1
+          ./iplists aggregate ips/pingdom.txt -w || exit 1
           [ -s ips/pingdom.txt ] || git checkout -- ips/pingdom.txt
         continue-on-error: true
 
@@ -93,6 +102,7 @@ jobs:
         id: stripe-webhooks
         run: |
           curl -sL https://stripe.com/files/ips/ips_webhooks.txt | ./iplists clean > ips/stripe-webhooks.txt || exit 1
+          ./iplists aggregate ips/stripe-webhooks.txt -w || exit 1
           [ -s ips/stripe-webhooks.txt ] || git checkout -- ips/stripe-webhooks.txt
         continue-on-error: true
 
@@ -104,6 +114,7 @@ jobs:
           curl -sL https://www.cloudflare.com/ips-v6 | ./iplists clean >> ips/cloudflare.txt || exit 1
           cat ips/cloudflare.txt | ./iplists clean > ips/cloudflare.txt.tmp
           mv ips/cloudflare.txt.tmp ips/cloudflare.txt
+          ./iplists aggregate ips/cloudflare.txt -w || exit 1
           [ -s ips/cloudflare.txt ] || git checkout -- ips/cloudflare.txt
         continue-on-error: true
 
@@ -113,6 +124,7 @@ jobs:
           curl -sL https://openai.com/searchbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/openai.txt || exit 1
           curl -sL https://openai.com/chatgpt-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> ips/openai.txt || exit 1
           curl -sL https://openai.com/gptbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> ips/openai.txt || exit 1
+          ./iplists aggregate ips/openai.txt -w || exit 1
           [ -s ips/openai.txt ] || git checkout -- ips/openai.txt
         continue-on-error: true
 
@@ -120,6 +132,7 @@ jobs:
         id: perplexity-bot
         run: |
           curl -sL https://www.perplexity.com/perplexitybot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/perplexity-bot.txt || exit 1
+          ./iplists aggregate ips/perplexity-bot.txt -w || exit 1
           [ -s ips/perplexity-bot.txt ] || git checkout -- ips/perplexity-bot.txt
         continue-on-error: true
 
@@ -127,6 +140,7 @@ jobs:
         id: perplexity-user
         run: |
           curl -sL https://www.perplexity.com/perplexity-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > ips/perplexity-user.txt || exit 1
+          ./iplists aggregate ips/perplexity-user.txt -w || exit 1
           [ -s ips/perplexity-user.txt ] || git checkout -- ips/perplexity-user.txt
         continue-on-error: true
 
@@ -134,6 +148,7 @@ jobs:
         id: oracle
         run: |
           curl -sL https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json | jq -r '.regions[] | [.cidrs][] | .[].cidr | select(. != null)' | ./iplists clean > ips/oracle.txt || exit 1
+          ./iplists aggregate ips/oracle.txt -w || exit 1
           [ -s ips/oracle.txt ] || git checkout -- ips/oracle.txt
         continue-on-error: true
 
@@ -141,6 +156,7 @@ jobs:
         id: statuscake
         run: |
           curl -sL https://app.statuscake.com/Workfloor/Locations.php?format=txt | ./iplists clean > ips/statuscake.txt || exit 1
+          ./iplists aggregate ips/statuscake.txt -w || exit 1
           [ -s ips/statuscake.txt ] || git checkout -- ips/statuscake.txt
         continue-on-error: true
 
@@ -148,6 +164,7 @@ jobs:
         id: twitterbot
         run: |
           whois -h whois.radb.net -- '-i origin AS13414' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > ips/twitterbot.txt || exit 1
+          ./iplists aggregate ips/twitterbot.txt -w || exit 1
           [ -s ips/twitterbot.txt ] || git checkout -- ips/twitterbot.txt
         continue-on-error: true
 
@@ -155,6 +172,7 @@ jobs:
         id: yahoo
         run: |
           curl -sL https://geoip.yahoo.net/georeport.csv | awk -F, '{print $1}' | ./iplists clean > ips/yahoo.txt || exit 1
+          ./iplists aggregate ips/yahoo.txt -w || exit 1
           [ -s ips/yahoo.txt ] || git checkout -- ips/yahoo.txt
         continue-on-error: true
 
@@ -163,6 +181,7 @@ jobs:
         run: |
           curl -sL https://iframely.com/ips-v4 | ./iplists clean > ips/iframely.txt || exit 1
           curl -sL https://iframely.com/ips-v6 | ./iplists clean >> ips/iframely.txt || exit 1
+          ./iplists aggregate ips/iframely.txt -w || exit 1
           [ -s ips/iframely.txt ] || git checkout -- ips/iframely.txt
         continue-on-error: true
 
@@ -170,6 +189,7 @@ jobs:
         id: internet-archive
         run: |
           whois -h whois.radb.net -- '-i origin AS7941' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > ips/internet-archive.txt || exit 1
+          ./iplists aggregate ips/internet-archive.txt -w || exit 1
           [ -s ips/internet-archive.txt ] || git checkout -- ips/internet-archive.txt
         continue-on-error: true
 
@@ -177,6 +197,7 @@ jobs:
         id: abuseipdb-100d
         run: |
           curl -sL https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-30d.ipv4 | awk -F" " '{print $1}' | ./iplists clean | sort -u > ips/abuseipdb-100d.txt || exit 1
+          ./iplists aggregate ips/abuseipdb-100d.txt -w || exit 1
           [ -s ips/abuseipdb-100d.txt ] || git checkout -- ips/abuseipdb-100d.txt
         continue-on-error: true
 
@@ -184,16 +205,18 @@ jobs:
         id: icloud-private-relay
         run: |
           curl -sL https://mask-api.icloud.com/egress-ip-ranges.csv | awk -F, '{print $1}' | ./iplists clean | sort -u > ips/icloud-private-relay.txt || exit 1
+          ./iplists aggregate ips/icloud-private-relay.txt  -w || exit 1
           [ -s ips/icloud-private-relay.txt ] || git checkout -- ips/icloud-private-relay.txt
         continue-on-error: true
 
       # VPN must come after iCloud Private Relay as those are then removed from this list
       - name: Generate VPN ip-list # Source: https://github.com/X4BNet/lists_vpn
-        id: vpn
+        id: vpns
         run: |
-          curl -sL https://raw.githubusercontent.com/X4BNet/lists_vpn/refs/heads/main/output/vpn/ipv4.txt | ./iplists clean | sort -u > ips/vpn.txt || exit 1
-          ./iplists prune ips/vpn.txt ips/icloud-private-relay.txt || exit 1
-          [ -s ips/vpn.txt ] || git checkout -- ips/vpn.txt
+          curl -sL https://raw.githubusercontent.com/X4BNet/lists_vpn/refs/heads/main/output/vpn/ipv4.txt | ./iplists clean | sort -u > ips/vpns.txt || exit 1
+          ./iplists prune ips/vpns.txt ips/icloud-private-relay.txt || exit 1
+          ./iplists aggregate ips/vpns.txt -w || exit 1
+          [ -s ips/vpns.txt ] || git checkout -- ips/vpn.txt
         continue-on-error: true
 
       # Proxies get pruned with VPN list
@@ -207,6 +230,7 @@ jobs:
           curl -sL https://api.openproxylist.xyz/socks5.txt | awk -F":" '{print $1}' | ./iplists clean >> $RUNNER_TEMP/proxies.txt || exit 1
           cat $RUNNER_TEMP/proxies.txt | sort -u > ips/proxies.txt || exit 1
           ./iplists prune ips/proxies.txt ips/vpn.txt || exit 1
+          ./iplists aggregate ips/proxies.txt -w || exit 1
           [ -s ips/proxies.txt ] || git checkout -- ips/proxies.txt
         continue-on-error: true
 
