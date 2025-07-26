@@ -207,10 +207,13 @@ jobs:
         continue-on-error: true
 
       # VPN must come after iCloud Private Relay as those are then removed from this list
-      - name: Generate VPN ip-list # Source: https://github.com/X4BNet/lists_vpn
+      - name: Generate VPN ip-list # Source: https://github.com/X4BNet/lists_vpn / https://github.com/coocoobau/vpn-ip-lists
         id: vpns
         run: |
           curl -sL https://raw.githubusercontent.com/X4BNet/lists_vpn/refs/heads/main/output/vpn/ipv4.txt | ./iplists clean | sort -u > $RUNNER_TEMP/vpns.txt || exit 1
+          curl -sL https://raw.githubusercontent.com/tn3w/ProtonVPN-IPs/refs/heads/master/protonvpn_ips.txt | ./iplists clean | sort -u >> $RUNNER_TEMP/vpns.txt || exit 1
+          curl -sL https://assets.windscribe.com/serverlist/mob-v2/0/$(date +%s) | jq --raw-output '.data[].groups[] | .ping_ip, (.nodes[]? | .ip, .ip2, .ip3, .ip4, .ip5) | select(. != null)' | ./iplists clean | sort -u >> $RUNNER_TEMP/vpns.txt || exit 1
+          curl -sL https://assets.windscribe.com/serverlist/mob-v2/1/$(date +%s) | jq --raw-output '.data[].groups[] | .ping_ip, (.nodes[]? | .ip, .ip2, .ip3, .ip4, .ip5) | select(. != null)' | ./iplists clean | sort -u >> $RUNNER_TEMP/vpns.txt || exit 1
           ./iplists prune $RUNNER_TEMP/vpns.txt lists/icloud-private-relay.txt || exit 1
           ./iplists aggregate $RUNNER_TEMP/vpns.txt -w || exit 1
           cat $RUNNER_TEMP/vpns.txt > lists/vpns.txt
