@@ -27,196 +27,193 @@ jobs:
       - name: Create Applebot ip-list
         id: applebot
         run: |
-          curl -sL https://search.developer.apple.com/applebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > lists/applebot.txt || exit 1
-          ./iplists aggregate lists/applebot.txt -w || exit 1
-          [ -s lists/applebot.txt ] || git checkout -- lists/applebot.txt
+          curl -sL https://search.developer.apple.com/applebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/applebot.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/applebot.txt -w || exit 1
+          cat $RUNNER_TEMP/applebot.txt > lists/applebot.txt
         continue-on-error: true
 
       - name: Generate GoogleBot ip-list # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
         id: googlebot
         run: |
-          curl -sL https://developers.google.com/static/search/apis/ipranges/googlebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > lists/googlebot.txt || exit 1
-          ./iplists aggregate lists/googlebot.txt -w || exit 1
-          [ -s lists/googlebot.txt ] || git checkout -- lists/googlebot.txt
+          curl -sL https://developers.google.com/static/search/apis/ipranges/googlebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/googlebot.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/googlebot.txt -w || exit 1
+          cat $RUNNER_TEMP/googlebot.txt > lists/googlebot.txt
         continue-on-error: true
 
       - name: Generate Google Special Crawlers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
         id: google-special
         run: |
-          curl -sL https://developers.google.com/static/search/apis/ipranges/special-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > lists/google-special.txt || exit 1
-          ./iplists aggregate lists/google-special.txt -w || exit 1
-          [ -s lists/google-special.txt ] || git checkout -- lists/google-special.txt
+          curl -sL https://developers.google.com/static/search/apis/ipranges/special-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/google-special.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/google-special.txt -w || exit 1
+          cat $RUNNER_TEMP/google-special.txt > lists/google-special.txt
         continue-on-error: true
 
       - name: Generate Google User-triggered Fetchers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
         id: google-user-triggered
         run: |
-          curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > lists/google-fetchers.txt || exit 1
-          curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> lists/google-fetchers.txt || exit 1
-          ./iplists aggregate lists/google-fetchers.txt -w || exit 1
-          [ -s lists/google-fetchers.txt ] || git checkout -- lists/google-fetchers.txt
+          curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/google-fetchers.txt || exit 1
+          curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> $RUNNER_TEMP/google-fetchers.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/google-fetchers.txt -w || exit 1
+          cat $RUNNER_TEMP/google-fetchers.txt > lists/google-fetchers.txt
         continue-on-error: true
 
       - name: Generate BingBot ip-list
         id: bingbot
         run: |
-          curl -sL https://www.bing.com/toolbox/bingbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > lists/bingbot.txt || exit 1
-          ./iplists aggregate lists/bingbot.txt -w || exit 1
-          [ -s lists/bingbot.txt ] || git checkout -- lists/bingbot.txt
+          curl -sL https://www.bing.com/toolbox/bingbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/bingbot.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/bingbot.txt -w || exit 1
+          cat $RUNNER_TEMP/bingbot.txt > lists/bingbot.txt
         continue-on-error: true
 
       - name: Generate FacebookBot ip-list # Source: https://developers.facebook.com/docs/sharing/webmasters/crawler/
         id: facebookbot
         run: |
-          whois -h whois.radb.net -- '-i origin AS32934' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > lists/facebookbot.txt || exit 1
-          ./iplists aggregate lists/facebookbot.txt -w || exit 1
-          [ -s lists/facebookbot.txt ] || git checkout -- lists/facebookbot.txt
+          whois -h whois.radb.net -- '-i origin AS32934' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/facebookbot.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/facebookbot.txt -w || exit 1
+          cat $RUNNER_TEMP/facebookbot.txt > lists/facebookbot.txt
         continue-on-error: true
 
       - name: Generate DuckDuckBot ip-list # Source: https://help.duckduckgo.com/duckduckgo-help-pages/results/duckduckbot/
         id: duckduckbot
         run: |
-          curl -sL https://raw.githubusercontent.com/duckduckgo/duckduckgo-help-pages/master/_docs/results/duckduckbot.md | grep "^\- " | awk '{gsub("-",""); print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > lists/duckduckbot.txt || exit 1
-          ./iplists aggregate lists/duckduckbot.txt -w || exit 1
-          [ -s lists/duckduckbot.txt ] || git checkout -- lists/duckduckbot.txt
+          curl -sL https://raw.githubusercontent.com/duckduckgo/duckduckgo-help-pages/master/_docs/results/duckduckbot.md | grep "^\- " | awk '{gsub("-",""); print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/duckduckbot.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/duckduckbot.txt -w || exit 1
+          cat $RUNNER_TEMP/duckduckbot.txt > lists/duckduckbot.txt
         continue-on-error: true
 
       - name: Get UptimeRobot IP List # Source: https://uptimerobot.com/help/locations/
         id: uptimerobot
         run: |
-          curl -sL https://uptimerobot.com/inc/files/ips/IPv4andIPv6.txt | ./iplists clean > lists/uptimerobot.txt || exit 1
-          ./iplists aggregate lists/uptimerobot.txt -w || exit 1
-          [ -s lists/uptimerobot.txt ] || git checkout -- lists/uptimerobot.txt
+          curl -sL https://uptimerobot.com/inc/files/ips/IPv4andIPv6.txt | ./iplists clean > $RUNNER_TEMP/uptimerobot.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/uptimerobot.txt -w || exit 1
+          cat $RUNNER_TEMP/uptimerobot.txt > lists/uptimerobot.txt
         continue-on-error: true
 
       - name: Get Pingdom IP List # Source: https://documentation.solarwinds.com/en/success_center/pingdom/content/topics/pingdom-probe-servers-ip-addresses.htm
         id: pingdom
         run: |
-          curl -sL https://my.pingdom.com/probes/ipv4 | ./iplists clean > lists/pingdom.txt || exit 1
-          curl -sL https://my.pingdom.com/probes/ipv6 | ./iplists clean >> lists/pingdom.txt || exit 1
-          ./iplists aggregate lists/pingdom.txt -w || exit 1
-          [ -s lists/pingdom.txt ] || git checkout -- lists/pingdom.txt
+          curl -sL https://my.pingdom.com/probes/ipv4 | ./iplists clean > $RUNNER_TEMP/pingdom.txt || exit 1
+          curl -sL https://my.pingdom.com/probes/ipv6 | ./iplists clean >> $RUNNER_TEMP/pingdom.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/pingdom.txt -w || exit 1
+          cat $RUNNER_TEMP/pingdom.txt > lists/pingdom.txt
         continue-on-error: true
 
       - name: Get Stripe Webhook IP List # Source: https://stripe.com/docs/ips
         id: stripe-webhooks
         run: |
-          curl -sL https://stripe.com/files/ips/ips_webhooks.txt | ./iplists clean > lists/stripe-webhooks.txt || exit 1
-          ./iplists aggregate lists/stripe-webhooks.txt -w || exit 1
-          [ -s lists/stripe-webhooks.txt ] || git checkout -- lists/stripe-webhooks.txt
+          curl -sL https://stripe.com/files/ips/ips_webhooks.txt | ./iplists clean > $RUNNER_TEMP/stripe-webhooks.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/stripe-webhooks.txt -w || exit 1
+          cat $RUNNER_TEMP/stripe-webhooks.txt > lists/stripe-webhooks.txt
         continue-on-error: true
 
       - name: Get Cloudflare IP List # Source: https://www.cloudflare.com/ips/
         id: cloudflare
         run: |
-          curl -sL https://www.cloudflare.com/ips-v4 | ./iplists clean > lists/cloudflare.txt || exit 1
-          echo "" >> lists/cloudflare.txt # join lists with new line (will be filtered out later)
-          curl -sL https://www.cloudflare.com/ips-v6 | ./iplists clean >> lists/cloudflare.txt || exit 1
-          cat lists/cloudflare.txt | ./iplists clean > lists/cloudflare.txt.tmp
-          mv lists/cloudflare.txt.tmp lists/cloudflare.txt
-          ./iplists aggregate lists/cloudflare.txt -w || exit 1
-          [ -s lists/cloudflare.txt ] || git checkout -- lists/cloudflare.txt
+          curl -sL https://www.cloudflare.com/ips-v4 | ./iplists clean > $RUNNER_TEMP/cloudflare.txt || exit 1
+          curl -sL https://www.cloudflare.com/ips-v6 | ./iplists clean >> $RUNNER_TEMP/cloudflare.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/cloudflare.txt -w || exit 1
+          cat $RUNNER_TEMP/cloudflare.txt > lists/cloudflare.txt
         continue-on-error: true
 
       - name: Get OpenAI IP List # Source: https://platform.openai.com/docs/gptbot
         id: openai
         run: |
-          curl -sL https://openai.com/searchbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > lists/openai.txt || exit 1
-          curl -sL https://openai.com/chatgpt-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> lists/openai.txt || exit 1
-          curl -sL https://openai.com/gptbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> lists/openai.txt || exit 1
-          ./iplists aggregate lists/openai.txt -w || exit 1
-          [ -s lists/openai.txt ] || git checkout -- lists/openai.txt
+          curl -sL https://openai.com/searchbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/openai.txt || exit 1
+          curl -sL https://openai.com/chatgpt-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> $RUNNER_TEMP/openai.txt || exit 1
+          curl -sL https://openai.com/gptbot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> $RUNNER_TEMP/openai.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/openai.txt -w || exit 1
+          cat $RUNNER_TEMP/openai.txt > lists/openai.txt
         continue-on-error: true
 
       - name: Get PerplexityBot IP List # https://docs.perplexity.ai/guides/bots
         id: perplexity-bot
         run: |
-          curl -sL https://www.perplexity.com/perplexitybot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > lists/perplexity-bot.txt || exit 1
-          ./iplists aggregate lists/perplexity-bot.txt -w || exit 1
-          [ -s lists/perplexity-bot.txt ] || git checkout -- lists/perplexity-bot.txt
+          curl -sL https://www.perplexity.com/perplexitybot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/perplexity-bot.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/perplexity-bot.txt -w || exit 1
+          cat $RUNNER_TEMP/perplexity-bot.txt > lists/perplexity-bot.txt
         continue-on-error: true
 
       - name: Get Perplexity User IP List # https://docs.perplexity.ai/guides/bots
         id: perplexity-user
         run: |
-          curl -sL https://www.perplexity.com/perplexity-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > lists/perplexity-user.txt || exit 1
-          ./iplists aggregate lists/perplexity-user.txt -w || exit 1
-          [ -s lists/perplexity-user.txt ] || git checkout -- lists/perplexity-user.txt
+          curl -sL https://www.perplexity.com/perplexity-user.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/perplexity-user.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/perplexity-user.txt -w || exit 1
+          cat $RUNNER_TEMP/perplexity-user.txt > lists/perplexity-user.txt
         continue-on-error: true
 
       - name: Get Oracle IP List # https://docs.oracle.com/en-us/iaas/Content/General/Concepts/addressranges.htm
         id: oracle
         run: |
-          curl -sL https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json | jq -r '.regions[] | [.cidrs][] | .[].cidr | select(. != null)' | ./iplists clean > lists/oracle.txt || exit 1
-          ./iplists aggregate lists/oracle.txt -w || exit 1
-          [ -s lists/oracle.txt ] || git checkout -- lists/oracle.txt
+          curl -sL https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json | jq -r '.regions[] | [.cidrs][] | .[].cidr | select(. != null)' | ./iplists clean > $RUNNER_TEMP/oracle.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/oracle.txt -w || exit 1
+          cat $RUNNER_TEMP/oracle.txt > lists/oracle.txt
         continue-on-error: true
 
       - name: Get StatusCake IP List # https://www.statuscake.com/kb/knowledge-base/what-are-your-ips/
         id: statuscake
         run: |
-          curl -sL https://app.statuscake.com/Workfloor/Locations.php?format=txt | ./iplists clean > lists/statuscake.txt || exit 1
-          ./iplists aggregate lists/statuscake.txt -w || exit 1
-          [ -s lists/statuscake.txt ] || git checkout -- lists/statuscake.txt
+          curl -sL https://app.statuscake.com/Workfloor/Locations.php?format=txt | ./iplists clean > $RUNNER_TEMP/statuscake.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/statuscake.txt -w || exit 1
+          cat $RUNNER_TEMP/statuscake.txt > lists/statuscake.txt
         continue-on-error: true
 
       - name: Generate Twitterbot ip-list # Source: https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards#validate_twitterbot
         id: twitterbot
         run: |
-          whois -h whois.radb.net -- '-i origin AS13414' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > lists/twitterbot.txt || exit 1
-          ./iplists aggregate lists/twitterbot.txt -w || exit 1
-          [ -s lists/twitterbot.txt ] || git checkout -- lists/twitterbot.txt
+          whois -h whois.radb.net -- '-i origin AS13414' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/twitterbot.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/twitterbot.txt -w || exit 1
+          cat $RUNNER_TEMP/twitterbot.txt > lists/twitterbot.txt
         continue-on-error: true
 
       - name: Generate Yahoo ip-list # Source: https://senders.yahooinc.com/mail-proxy-servers/
         id: yahoo
         run: |
-          curl -sL https://geoip.yahoo.net/georeport.csv | awk -F, '{print $1}' | ./iplists clean > lists/yahoo.txt || exit 1
-          ./iplists aggregate lists/yahoo.txt -w || exit 1
-          [ -s lists/yahoo.txt ] || git checkout -- lists/yahoo.txt
+          curl -sL https://geoip.yahoo.net/georeport.csv | awk -F, '{print $1}' | ./iplists clean > $RUNNER_TEMP/yahoo.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/yahoo.txt -w || exit 1
+          cat $RUNNER_TEMP/yahoo.txt > lists/yahoo.txt
         continue-on-error: true
 
       - name: Generate Iframely ip-list # Source: https://iframely.com/docs/about
         id: iframely
         run: |
-          curl -sL https://iframely.com/ips-v4 | ./iplists clean > lists/iframely.txt || exit 1
-          curl -sL https://iframely.com/ips-v6 | ./iplists clean >> lists/iframely.txt || exit 1
-          ./iplists aggregate lists/iframely.txt -w || exit 1
-          [ -s lists/iframely.txt ] || git checkout -- lists/iframely.txt
+          curl -sL https://iframely.com/ips-v4 | ./iplists clean > $RUNNER_TEMP/iframely.txt || exit 1
+          curl -sL https://iframely.com/ips-v6 | ./iplists clean >> $RUNNER_TEMP/iframely.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/iframely.txt -w || exit 1
+          cat $RUNNER_TEMP/iframely.txt > lists/iframely.txt
         continue-on-error: true
 
       - name: Generate Internet Archive ip-list
         id: internet-archive
         run: |
-          whois -h whois.radb.net -- '-i origin AS7941' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > lists/internet-archive.txt || exit 1
-          ./iplists aggregate lists/internet-archive.txt -w || exit 1
-          [ -s lists/internet-archive.txt ] || git checkout -- lists/internet-archive.txt
+          whois -h whois.radb.net -- '-i origin AS7941' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/internet-archive.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/internet-archive.txt -w || exit 1
+          cat $RUNNER_TEMP/internet-archive.txt > lists/internet-archive.txt
         continue-on-error: true
 
       - name: Generate AbuseIPDB 100d ip-list # Source: https://github.com/borestad/blocklist-abuseipdb
         id: abuseipdb-100d
         run: |
-          curl -sL https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-30d.ipv4 | awk -F" " '{print $1}' | ./iplists clean | sort -u > lists/abuseipdb-100d.txt || exit 1
-          ./iplists aggregate lists/abuseipdb-100d.txt -w || exit 1
-          [ -s lists/abuseipdb-100d.txt ] || git checkout -- lists/abuseipdb-100d.txt
+          curl -sL https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-30d.ipv4 | awk -F" " '{print $1}' | ./iplists clean | sort -u > $RUNNER_TEMP/abuseipdb-30d.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/abuseipdb-30d.txt -w || exit 1
+          cat $RUNNER_TEMP/abuseipdb-30d.txt > lists/abuseipdb-30d.txt
         continue-on-error: true
 
       - name: Generate iCloud Private Relay ip-list # Source: https://blog.cloudflare.com/icloud-private-relay/
         id: icloud-private-relay
         run: |
-          curl -sL https://mask-api.icloud.com/egress-ip-ranges.csv | awk -F, '{print $1}' | ./iplists clean | sort -u > lists/icloud-private-relay.txt || exit 1
-          ./iplists aggregate lists/icloud-private-relay.txt  -w || exit 1
-          [ -s lists/icloud-private-relay.txt ] || git checkout -- lists/icloud-private-relay.txt
+          curl -sL https://mask-api.icloud.com/egress-ip-ranges.csv | awk -F, '{print $1}' | ./iplists clean | sort -u > $RUNNER_TEMP/icloud-private-relay.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/icloud-private-relay.txt  -w || exit 1
+          cat $RUNNER_TEMP/icloud-private-relay.txt > lists/icloud-private-relay.txt
         continue-on-error: true
 
       # VPN must come after iCloud Private Relay as those are then removed from this list
       - name: Generate VPN ip-list # Source: https://github.com/X4BNet/lists_vpn
         id: vpns
         run: |
-          curl -sL https://raw.githubusercontent.com/X4BNet/lists_vpn/refs/heads/main/output/vpn/ipv4.txt | ./iplists clean | sort -u > lists/vpns.txt || exit 1
-          ./iplists prune lists/vpns.txt lists/icloud-private-relay.txt || exit 1
-          ./iplists aggregate lists/vpns.txt -w || exit 1
-          [ -s lists/vpns.txt ] || git checkout -- lists/vpns.txt
+          curl -sL https://raw.githubusercontent.com/X4BNet/lists_vpn/refs/heads/main/output/vpn/ipv4.txt | ./iplists clean | sort -u > $RUNNER_TEMP/vpns.txt || exit 1
+          ./iplists prune $RUNNER_TEMP/vpns.txt lists/icloud-private-relay.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/vpns.txt -w || exit 1
+          cat $RUNNER_TEMP/vpns.txt > lists/vpns.txt
         continue-on-error: true
 
       # Proxies get pruned with VPN list
@@ -228,18 +225,17 @@ jobs:
           curl -sL https://api.openproxylist.xyz/https.txt | awk -F":" '{print $1}' | ./iplists clean >> $RUNNER_TEMP/proxies.txt || exit 1
           curl -sL https://api.openproxylist.xyz/socks4.txt | awk -F":" '{print $1}' | ./iplists clean >> $RUNNER_TEMP/proxies.txt || exit 1
           curl -sL https://api.openproxylist.xyz/socks5.txt | awk -F":" '{print $1}' | ./iplists clean >> $RUNNER_TEMP/proxies.txt || exit 1
-          cat $RUNNER_TEMP/proxies.txt | sort -u > lists/proxies.txt || exit 1
-          ./iplists prune lists/proxies.txt lists/vpns.txt || exit 1
-          ./iplists aggregate lists/proxies.txt -w || exit 1
-          [ -s lists/proxies.txt ] || git checkout -- lists/proxies.txt
+          ./iplists prune $RUNNER_TEMP/proxies.txt lists/vpns.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/proxies.txt -w || exit 1
+          cat $RUNNER_TEMP/proxies.txt > lists/proxies.txt
         continue-on-error: true
 
       - name: Generate Tor exit nodes ip-list # Source: https://github.com/okinjp/tor_ips
         id: tor
         run: |
-          curl -sL https://raw.githubusercontent.com/okinjp/tor_ips/refs/heads/main/tor-ips.txt | ./iplists clean | sort -u > lists/tor-exit-nodes.txt || exit 1
-          ./iplists aggregate lists/tor-exit-nodes.txt -w || exit 1
-          [ -s lists/tor-exit-nodes.txt ] || git checkout -- lists/tor-exit-nodes.txt
+          curl -sL https://raw.githubusercontent.com/okinjp/tor_ips/refs/heads/main/tor-ips.txt | ./iplists clean | sort -u > $RUNNER_TEMP/tor-exit-nodes.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/tor-exit-nodes.txt -w || exit 1
+          cat $RUNNER_TEMP/tor-exit-nodes.txt > lists/tor-exit-nodes.txt
         continue-on-error: true
 
       - name: Commit & push updated ip-lists
