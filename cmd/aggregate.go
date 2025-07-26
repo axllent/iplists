@@ -121,9 +121,9 @@ var aggregateCmd = &cobra.Command{
 		}
 
 		fmt.Printf(
-			"Aggregated %s into %s IPs & CIDRs in %s\n",
-			lib.NumberFormat(len(lines)),
+			"Aggregated %s from %s IPs & CIDRs in %s\n",
 			lib.NumberFormat(len(outputIPv4)+len(outputIPv6)),
+			lib.NumberFormat(len(lines)),
 			args[0],
 		)
 	},
