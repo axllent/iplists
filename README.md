@@ -1,8 +1,7 @@
 # IP Lists
 
-A personal curated list of IP and CIDR addresses belonging to various networks (good and bad!) for use in a WAF and/or firewall.
+This repository contains a curated collection of IP and CIDR addresses associated with various networks (both beneficial and malicious) for use in WAFs and/or firewalls.
 
-The lists are sourced from various places (see [generate_ip_lists.yml](.github/workflows/generate_iplists.yml)).
+The lists are compiled from multiple sources (refer to [generate_ip_lists.yml](.github/workflows/generate_iplists.yml)) and are optimized by aggregating entries into CIDR blocks wherever possible, significantly reducing the total number of entries.
 
-Although public and open source, the lists in this repository are not intended for public use as they are subject to change at any time (I will rename, remove or add lists as I need).
-If you want modifications then you can fork and maintain your own version :)
+While this repository is public and open source, the lists are intended for personal use and may change at any time (lists may be renamed, removed, or added as needed). If you wish to use it then feel free to fork the repository and and maintain your own version.
