@@ -107,12 +107,7 @@ func UpdateADBCache(key, cache string, days int) error {
 	// build the updated list in order of IP addresses
 	updatedEntries := make([]Entry, 0, len(existingIPs))
 	for _, k := range keys {
-		i := existingIPs[k]
-		if i.FirstSeen == "" {
-			// ensure FirstSeen is not empty - temporary fix to populate existing IPs
-			i.FirstSeen = i.LastSeen
-		}
-		updatedEntries = append(updatedEntries, i)
+		updatedEntries = append(updatedEntries, existingIPs[k])
 	}
 
 	// write the updated entries to the cache file
