@@ -15,8 +15,9 @@ import (
 
 // Entry represents an entry in the AbuseIPDb cache.
 type Entry struct {
-	IP       string `json:"ip"`
-	LastSeen string `json:"last_seen"`
+	IP        string `json:"ip"`
+	LastSeen  string `json:"last_seen"`
+	FirstSeen string `json:"first_seen"`
 }
 
 // UpdateADBCache fetches the AbuseIPDb blacklist and updates the local cache.
@@ -66,14 +67,15 @@ func UpdateADBCache(key, cache string, days int) error {
 	for _, ip := range listIPs {
 		now := time.Now().UTC().Format(`2006-01-02`)
 		if entry, exists := existingIPs[ip]; exists {
-			// If the IP already exists, update the last seen time
+			// If the IP already exists, update the last seen date
 			entry.LastSeen = now
 			existingIPs[ip] = entry
 		} else {
-			// If the IP does not exist, add it with the current time
+			// If the IP does not exist, add it with the current date
 			existingIPs[ip] = Entry{
-				IP:       ip,
-				LastSeen: now,
+				IP:        ip,
+				LastSeen:  now,
+				FirstSeen: now,
 			}
 			added++
 		}
@@ -105,7 +107,12 @@ func UpdateADBCache(key, cache string, days int) error {
 	// build the updated list in order of IP addresses
 	updatedEntries := make([]Entry, 0, len(existingIPs))
 	for _, k := range keys {
-		updatedEntries = append(updatedEntries, existingIPs[k])
+		i := existingIPs[k]
+		if i.FirstSeen == "" {
+			// ensure FirstSeen is not empty - temporary fix to populate existing IPs
+			i.FirstSeen = i.LastSeen
+		}
+		updatedEntries = append(updatedEntries, i)
 	}
 
 	// write the updated entries to the cache file
@@ -116,7 +123,7 @@ func UpdateADBCache(key, cache string, days int) error {
 	defer func() { _ = file.Close() }()
 
 	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ") // for pretty printing
+	encoder.SetIndent("", " ") // for pretty printing
 	if err := encoder.Encode(updatedEntries); err != nil {
 		return fmt.Errorf("failed to write to cache file: %w", err)
 	}
