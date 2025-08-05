@@ -10,6 +10,7 @@ import (
 )
 
 // ValidAddress checks if the given IP or CIDR is valid and not a private address.
+// @see https://en.wikipedia.org/wiki/Reserved_IP_addresses
 func ValidAddress(ip string) bool {
 	if strings.Contains(ip, "/") {
 		// parse as a CIDR notation
@@ -17,14 +18,14 @@ func ValidAddress(ip string) bool {
 		if err != nil {
 			return false
 		}
-
-		if parsedIP == nil || parsedIP.IsPrivate() {
+		// Go seems to miss a few important entries, namely 127.* and 0.*
+		if parsedIP == nil || parsedIP.IsPrivate() || strings.HasPrefix(ip, "127.") || strings.HasPrefix(ip, "0.") {
 			return false
 		}
 	} else {
 		// Check if it's a CIDR notation
 		parsedIP := net.ParseIP(ip)
-		if parsedIP == nil || parsedIP.IsPrivate() {
+		if parsedIP == nil || parsedIP.IsPrivate() || strings.HasPrefix(ip, "127.") || strings.HasPrefix(ip, "0.") {
 			return false
 		}
 	}
