@@ -241,7 +241,7 @@ jobs:
         continue-on-error: true
 
       - name: Generate 3xK Tech GmbH ip-list
-        id: 3xktech
+        id: AS2003733xktech
         run: |
           whois -h whois.radb.net -- '-i origin AS200373' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/3xktech.txt || exit 1
           ./iplists aggregate $RUNNER_TEMP/3xktech.txt -w || exit 1
