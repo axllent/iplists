@@ -258,6 +258,14 @@ jobs:
           cat $RUNNER_TEMP/unified-layer.txt > lists/unified-layer.txt
         continue-on-error: true
 
+      - name: Generate Namecheap ip-list
+        id: AS22612
+        run: |
+          whois -h whois.radb.net -- '-i origin AS22612' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/namecheap.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/namecheap.txt -w || exit 1
+          cat $RUNNER_TEMP/namecheap.txt > lists/namecheap.txt
+        continue-on-error: true
+
       - name: Generate AbuseIPDB 100d ip-list # Source: https://github.com/borestad/blocklist-abuseipdb
         id: abuseipdb-100d
         run: |
