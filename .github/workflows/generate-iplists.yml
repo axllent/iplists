@@ -249,10 +249,11 @@ jobs:
           cat $RUNNER_TEMP/3xktech.txt > lists/3xktech.txt
         continue-on-error: true
 
-      - name: Generate Unified Layer ip-list
+      - name: Generate Unified Layer / HostGator ip-list
         id: AS46606
         run: |
           whois -h whois.radb.net -- '-i origin AS46606' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/unified-layer.txt || exit 1
+          whois -h whois.radb.net -- '-i origin AS19871' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean >> $RUNNER_TEMP/unified-layer.txt || exit 1
           ./iplists aggregate $RUNNER_TEMP/unified-layer.txt -w || exit 1
           cat $RUNNER_TEMP/unified-layer.txt > lists/unified-layer.txt
         continue-on-error: true
