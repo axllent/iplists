@@ -1,11 +1,11 @@
 module iplists
 
-go 1.23.1
+go 1.24.0
 
 require (
 	github.com/projectdiscovery/mapcidr v1.1.34
 	github.com/spf13/cobra v1.9.1
-	golang.org/x/text v0.27.0
+	golang.org/x/text v0.29.0
 )
 
 require (
