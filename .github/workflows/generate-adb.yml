@@ -27,9 +27,9 @@ jobs:
 
       - name: Generate ADB IP list
         run: |
-          ./iplists adb build cache/adb.json lists/abuseipdb-dont-use.txt -d 30 || exit 1
-          ./iplists aggregate lists/abuseipdb-dont-use.txt -w|| exit 1
-          [ -s lists/abuseipdb-dont-use.txt ] || git checkout -- lists/abuseipdb-dont-use.txt
+          ./iplists adb build cache/adb.json lists/abuseipdb-30d.txt -d 30 || exit 1
+          ./iplists aggregate lists/abuseipdb-30d.txt -w|| exit 1
+          [ -s lists/abuseipdb-30d.txt ] || git checkout -- lists/abuseipdb-30d.txt
 
       - name: Commit & push updated IP-List
         run: |
