@@ -266,6 +266,14 @@ jobs:
           cat $RUNNER_TEMP/namecheap.txt > lists/namecheap.txt
         continue-on-error: true
 
+      - name: Generate CHINA UNICOM China169 Backbone ip-list
+        id: AS4837
+        run: |
+          whois -h whois.radb.net -- '-i origin AS4837' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/chinaunicom.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/chinaunicom.txt -w || exit 1
+          cat $RUNNER_TEMP/chinaunicom.txt > lists/chinaunicom.txt
+        continue-on-error: true
+
       # - name: Generate AbuseIPDB 100d ip-list # Source: https://github.com/borestad/blocklist-abuseipdb
       #   id: abuseipdb-100d
       #   run: |
