@@ -287,6 +287,7 @@ jobs:
         id: AS212238
         run: |
           whois -h whois.radb.net -- '-i origin AS212238' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/datacamp-limited.txt || exit 1
+          whois -h whois.radb.net -- '-i origin AS60068' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean >> $RUNNER_TEMP/datacamp-limited.txt || exit 1
           ./iplists aggregate $RUNNER_TEMP/datacamp-limited.txt -w || exit 1
           cat $RUNNER_TEMP/datacamp-limited.txt > lists/datacamp-limited.txt
         continue-on-error: true
