@@ -20,7 +20,7 @@ var adbBuildCmd = &cobra.Command{
 	
 It will read the local cache and output a list of IPs that are currently listed,
 active in the last N days (see flags).`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		entries := adb.LoadADBCache(args[0], adbDays)
 		if len(entries) == 0 {
 			fmt.Println("No valid entries found in the local cache.")

@@ -25,7 +25,7 @@ var aggregateCmd = &cobra.Command{
 	Short: "Aggregate IPs/CIDRs into minimum IPs & subnets",
 	Long:  `Aggregate IPs/CIDRs into minimum IPs & subnets.`,
 	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		lines, err := lib.GetContents(path.Clean(args[0]))
 		if err != nil {
 			fmt.Printf("Error reading file %s: %v\n", args[0], err)
