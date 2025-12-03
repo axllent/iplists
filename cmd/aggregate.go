@@ -115,6 +115,11 @@ var aggregateCmd = &cobra.Command{
 			}
 		}
 
+		if len(lines) == 0 {
+			fmt.Fprintf(os.Stderr, "No valid IPs found in file %s\n", args[1])
+			os.Exit(1)
+		}
+
 		if len(lines) == len(outputIPv4)+len(outputIPv6) {
 			fmt.Println("No aggregation needed, input and output are the same.")
 			return
