@@ -20,7 +20,7 @@ var adbFetchCmd = &cobra.Command{
 	Long: `This will update the local cache with the latest IPs from AbuseIPDb.
 
 IPs not seen in the last N days will be pruned from the cache (see flags).`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		keys, set := os.LookupEnv("ADB_KEY")
 		if !set || keys == "" {
 			fmt.Fprintln(os.Stderr, "ADB_KEY environment variable must be set to your AbuseIPDb API key")
