@@ -81,12 +81,12 @@ jobs:
           cat $RUNNER_TEMP/duckduckbot.txt > lists/duckduckbot.txt
         continue-on-error: true
 
-      - name: Generate Quant ip-list
-        id: quant
+      - name: Generate Quantbot ip-list
+        id: quantbot
         run: |
-          whois -h whois.radb.net -- '-i origin AS199064' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/quant.txt || exit 1
-          ./iplists aggregate $RUNNER_TEMP/quant.txt -w || exit 1
-          cat $RUNNER_TEMP/quant.txt > lists/quant.txt
+          whois -h whois.radb.net -- '-i origin AS199064' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/quantbot.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/quantbot.txt -w || exit 1
+          cat $RUNNER_TEMP/quantbot.txt > lists/quantbot.txt
         continue-on-error: true
 
       - name: Get UptimeRobot IP List # Source: https://uptimerobot.com/help/locations/
