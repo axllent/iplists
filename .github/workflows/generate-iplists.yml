@@ -224,6 +224,14 @@ jobs:
           cat $RUNNER_TEMP/alibaba.txt > lists/alibaba.txt
         continue-on-error: true
 
+      - name: Generate Automattic ip-list
+        id: automattic
+        run: |
+          whois -h whois.radb.net -- '-i origin AS2635' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/automattic.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/automattic.txt -w || exit 1
+          cat $RUNNER_TEMP/automattic.txt > lists/automattic.txt
+        continue-on-error: true
+
       - name: Generate Huawei ip-list
         id: huawei
         run: |
