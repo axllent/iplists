@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/projectdiscovery/mapcidr v1.1.95
 	github.com/spf13/cobra v1.10.1
-	golang.org/x/text v0.29.0
+	golang.org/x/text v0.32.0
 )
 
 require (
