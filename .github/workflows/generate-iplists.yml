@@ -313,6 +313,9 @@ jobs:
         id: AS207990
         run: |
           whois -h whois.radb.net -- '-i origin AS207990' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/hostroyale.txt || exit 1
+          whois -h whois.radb.net -- '-i origin AS203020' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean >> $RUNNER_TEMP/hostroyale.txt || exit 1
+          whois -h whois.radb.net -- '-i origin AS133499' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean >> $RUNNER_TEMP/hostroyale.txt || exit 1
+          whois -h whois.radb.net -- '-i origin AS134450' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean >> $RUNNER_TEMP/hostroyale.txt || exit 1
           ./iplists aggregate $RUNNER_TEMP/hostroyale.txt -w || exit 1
           cat $RUNNER_TEMP/hostroyale.txt > lists/hostroyale.txt
         continue-on-error: true
