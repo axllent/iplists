@@ -395,6 +395,12 @@ jobs:
           cat $RUNNER_TEMP/tor-exit-nodes.txt > lists/tor-exit-nodes.txt
         continue-on-error: true
 
+      - name: Generate Microsoft Teams ip-list # Source: https://learn.microsoft.com/en-us/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide
+        id: ms-teams
+        run: |
+          ./iplists o365-ips lists/microsoft-teams.txt || exit 1
+        continue-on-error: true
+
       - name: Commit & push updated ip-lists
         run: |
           git config user.name 'github-actions[bot]'
