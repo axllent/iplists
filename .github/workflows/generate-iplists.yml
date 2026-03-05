@@ -320,6 +320,14 @@ jobs:
           cat $RUNNER_TEMP/hostroyale.txt > lists/hostroyale.txt
         continue-on-error: true
 
+      - name: Generate GTT Communications Inc ip-list
+        id: AS3257
+        run: |
+          whois -h whois.radb.net -- '-i origin AS3257' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/gtt-communications.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/gtt-communications.txt -w || exit 1
+          cat $RUNNER_TEMP/gtt-communications.txt > lists/gtt-communications.txt
+        continue-on-error: true
+
       - name: Generate VNPT Corp ip-list
         id: AS45899
         run: |
