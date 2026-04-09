@@ -34,7 +34,7 @@ jobs:
           [ -s lists/abuseipdb-30d.txt ] || git checkout -- lists/abuseipdb-30d.txt
           ./iplists adb s3-push $RUNNER_TEMP/adb.json || exit 1
 
-      - name: Commit & push updated IP-List
+      - name: Commit & push updated ADB list
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
