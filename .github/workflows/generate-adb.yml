@@ -19,17 +19,20 @@ jobs:
       - name: Compile CLI
         run: go build -ldflags "-s -w" .
 
-      - name: Get latest ADB IPs
+      - name: Update ADB list
         env:
+          AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          AWS_ENDPOINT: "${{ secrets.AWS_ENDPOINT }}"
+          AWS_BUCKET: "${{ secrets.AWS_BUCKET }}"
           ADB_KEY: "${{ secrets.ADB_KEY }}"
         run: |
+          ./iplists adb s3-pull cache/adb.json || exit 1
           ./iplists adb fetch cache/adb.json || exit 1
-
-      - name: Generate ADB IP list
-        run: |
           ./iplists adb build cache/adb.json lists/abuseipdb-30d.txt -d 30 || exit 1
-          ./iplists aggregate lists/abuseipdb-30d.txt -w|| exit 1
+          ./iplists aggregate lists/abuseipdb-30d.txt -w || exit 1
           [ -s lists/abuseipdb-30d.txt ] || git checkout -- lists/abuseipdb-30d.txt
+          ./iplists adb s3-push cache/adb.json || exit 1
 
       - name: Commit & push updated IP-List
         run: |
