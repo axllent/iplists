@@ -329,6 +329,14 @@ jobs:
           cat $RUNNER_TEMP/vnpt-corp.txt > lists/vnpt-corp.txt
         continue-on-error: true
 
+      - name: Web2objects LLC
+        id: AS62874
+        run: |
+          whois -h whois.radb.net -- '-i origin AS62874' | grep ^route | awk '{gsub("(route:|route6:)","");print}' | awk '{gsub(/ /,""); print}' | ./iplists clean > $RUNNER_TEMP/web2objects.txt || exit 1
+          ./iplists aggregate $RUNNER_TEMP/web2objects.txt -w || exit 1
+          cat $RUNNER_TEMP/web2objects.txt > lists/web2objects.txt
+        continue-on-error: true
+
       - name: Wikimedia Foundation Inc # Source: https://meta.wikimedia.org/wiki/InternetArchiveBot/FAQ_for_sysadmins
         id: wikimedia
         run: |
