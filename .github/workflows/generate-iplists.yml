@@ -84,7 +84,7 @@ jobs:
       - name: GoogleBot # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
         id: googlebot
         run: |
-          curl -sL https://developers.google.com/static/search/apis/ipranges/googlebot.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/googlebot.txt || exit 1
+          curl -sL https://developers.google.com/static/crawling/ipranges/common-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/googlebot.txt || exit 1
           ./iplists aggregate $RUNNER_TEMP/googlebot.txt -w || exit 1
           cat $RUNNER_TEMP/googlebot.txt > lists/googlebot.txt
         continue-on-error: true
@@ -92,7 +92,7 @@ jobs:
       - name: Google Special Crawlers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
         id: google-special
         run: |
-          curl -sL https://developers.google.com/static/search/apis/ipranges/special-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/google-special.txt || exit 1
+          curl -sL https://developers.google.com/static/crawling/ipranges/special-crawlers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/google-special.txt || exit 1
           ./iplists aggregate $RUNNER_TEMP/google-special.txt -w || exit 1
           cat $RUNNER_TEMP/google-special.txt > lists/google-special.txt
         continue-on-error: true
@@ -100,8 +100,8 @@ jobs:
       - name: Google User-triggered Fetchers # Source: https://developers.google.com/search/docs/crawling-indexing/verifying-googlebot
         id: google-user-triggered
         run: |
-          curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/google-fetchers.txt || exit 1
-          curl -sL https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> $RUNNER_TEMP/google-fetchers.txt || exit 1
+          curl -sL https://developers.google.com/static/crawling/ipranges/user-triggered-fetchers.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean > $RUNNER_TEMP/google-fetchers.txt || exit 1
+          curl -sL https://developers.google.com/static/crawling/ipranges/user-triggered-fetchers-google.json | jq -r '.prefixes[].ipv6Prefix,.prefixes[].ipv4Prefix | select( . != null )' | ./iplists clean >> $RUNNER_TEMP/google-fetchers.txt || exit 1
           ./iplists aggregate $RUNNER_TEMP/google-fetchers.txt -w || exit 1
           cat $RUNNER_TEMP/google-fetchers.txt > lists/google-fetchers.txt
         continue-on-error: true
