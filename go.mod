@@ -6,7 +6,7 @@ require (
 	github.com/minio/minio-go/v7 v7.2.1
 	github.com/projectdiscovery/mapcidr v1.1.97
 	github.com/spf13/cobra v1.10.2
-	golang.org/x/text v0.37.0
+	golang.org/x/text v0.38.0
 )
 
 require (
