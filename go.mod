@@ -1,12 +1,12 @@
 module iplists
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/minio/minio-go/v7 v7.3.0
 	github.com/projectdiscovery/mapcidr v1.1.97
 	github.com/spf13/cobra v1.10.2
-	golang.org/x/text v0.41.0
+	golang.org/x/text v0.42.0
 )
 
 require (
