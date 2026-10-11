@@ -3,13 +3,14 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"iplists/cmd/internal/lib"
 	"net"
 	"os"
-	"os/exec"
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/projectdiscovery/mapcidr"
 	"github.com/spf13/cobra"
@@ -38,9 +39,19 @@ ASN arguments can be specified with or without the "AS" prefix (e.g. AS13414 or 
 				asn = "AS" + strings.TrimPrefix(strings.ToUpper(asn), "AS")
 			}
 
-			out, err := exec.Command("whois", "-h", "whois.radb.net", "--", "-i", "origin", asn).Output()
+			conn, err := net.DialTimeout("tcp", "whois.radb.net:43", 10*time.Second)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error querying RADB for %s: %v\n", asn, err)
+				fmt.Fprintf(os.Stderr, "Error connecting to RADB for %s: %v\n", asn, err)
+				continue
+			}
+
+			_ = conn.SetReadDeadline(time.Now().Add(30 * time.Second))
+			fmt.Fprintf(conn, "-i origin %s\r\n", asn)
+
+			out, err := io.ReadAll(conn)
+			conn.Close()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error reading RADB response for %s: %v\n", asn, err)
 				continue
 			}
 
