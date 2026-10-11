@@ -99,9 +99,9 @@ jobs:
         continue-on-error: true
 
       - name: GTT Communications Inc
-        id: AS3257
+        id: gtt-communications
         run: |
-          ./iplists asn-ips AS3257 AS30058 AS46635 > $RUNNER_TEMP/gtt-communications.txt || exit 1
+          ./iplists asn-ips AS5580 AS8582 AS3291 AS8928 AS3257 > $RUNNER_TEMP/gtt-communications.txt || exit 1
           cat $RUNNER_TEMP/gtt-communications.txt > lists/gtt-communications.txt
         continue-on-error: true
 
@@ -114,9 +114,9 @@ jobs:
         continue-on-error: true
 
       - name: HostRoyale
-        id: AS207990
+        id: host-royale
         run: |
-          ./iplists asn-ips AS207990 AS203020 AS133499 AS134450 AS204287 > $RUNNER_TEMP/hostroyale.txt || exit 1
+          ./iplists asn-ips AS207990 AS133499 AS44144 AS39486 AS46516 AS134450 AS203020 AS204287 AS396931 > $RUNNER_TEMP/hostroyale.txt || exit 1
           cat $RUNNER_TEMP/hostroyale.txt > lists/hostroyale.txt
         continue-on-error: true
 
