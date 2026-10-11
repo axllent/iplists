@@ -49,6 +49,13 @@ jobs:
           cat $RUNNER_TEMP/byteplus.txt > lists/byteplus.txt
         continue-on-error: true
 
+      - name: China169
+        id: china169
+        run: |
+          ./iplists asn-ips AS4837 AS17816 > $RUNNER_TEMP/china169.txt || exit 1
+          cat $RUNNER_TEMP/china169.txt > lists/china169.txt
+        continue-on-error: true
+
       - name: China Mobile
         id: china-mobile
         run: |
