@@ -19,11 +19,6 @@ jobs:
       - name: Compile CLI
         run: go build  -ldflags "-s -w" .
 
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: whois
-          version: 1.0
-
       - name: Applebot
         id: applebot
         run: |
