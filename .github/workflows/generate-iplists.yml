@@ -49,6 +49,13 @@ jobs:
           cat $RUNNER_TEMP/byteplus.txt > lists/byteplus.txt
         continue-on-error: true
 
+      - name: China Mobile
+        id: china-mobile
+        run: |
+          ./iplists asn-ips AS56048 AS141419 AS141425 AS137872 AS328787 AS58807 AS135054 AS56047 AS56041 AS134810 AS56045 AS268862 AS9231 AS132510 AS209141 AS56044 AS56046 AS58453 AS149967 AS136750 AS139619 AS9808 AS56042 AS56040 > $RUNNER_TEMP/china-mobile.txt || exit 1
+          cat $RUNNER_TEMP/china-mobile.txt > lists/china-mobile.txt
+        continue-on-error: true
+
       - name: Cloudflare # Source: https://www.cloudflare.com/ips/
         id: cloudflare
         run: |
