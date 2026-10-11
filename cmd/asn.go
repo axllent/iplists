@@ -10,6 +10,7 @@ import (
 )
 
 var asnDBPath string
+var asnIDsOnly bool
 
 // asnCmd represents the asn command
 var asnCmd = &cobra.Command{
@@ -52,7 +53,9 @@ Results are printed as CSV: ASN,Name`,
 
 			if strings.Contains(strings.ToLower(record.AutonomousSystemOrganization), search) {
 				seen[record.AutonomousSystemNumber] = true
-				fmt.Printf("AS%d,%s\n", record.AutonomousSystemNumber, record.AutonomousSystemOrganization)
+				if !asnIDsOnly {
+					fmt.Printf("AS%d,%s\n", record.AutonomousSystemNumber, record.AutonomousSystemOrganization)
+				}
 			}
 		}
 
@@ -60,10 +63,19 @@ Results are printed as CSV: ASN,Name`,
 			fmt.Fprintf(os.Stderr, "Error iterating networks: %v\n", err)
 			os.Exit(1)
 		}
+
+		if asnIDsOnly {
+			ids := make([]string, 0, len(seen))
+			for id := range seen {
+				ids = append(ids, fmt.Sprintf("AS%d", id))
+			}
+			fmt.Println(strings.Join(ids, " "))
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(asnCmd)
 	asnCmd.Flags().StringVarP(&asnDBPath, "db", "d", "/usr/share/GeoIP/GeoLite2-ASN.mmdb", "Path to GeoLite2 ASN database")
+	asnCmd.Flags().BoolVarP(&asnIDsOnly, "ids", "i", false, "Print only ASN IDs space-separated")
 }
