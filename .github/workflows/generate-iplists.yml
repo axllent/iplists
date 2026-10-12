@@ -225,6 +225,13 @@ jobs:
           cat $RUNNER_TEMP/stripe-webhooks.txt > lists/stripe-webhooks.txt
         continue-on-error: true
 
+      - name: Tencent Building
+        id: tencent-building
+        run: |
+          ./iplists asn-ips AS132203 > $RUNNER_TEMP/tencent-building.txt || exit 1
+          cat $RUNNER_TEMP/tencent-building.txt > lists/tencent-building.txt
+        continue-on-error: true
+
       - name: Twitterbot # Source: https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards#validate_twitterbot
         id: twitterbot
         run: |
