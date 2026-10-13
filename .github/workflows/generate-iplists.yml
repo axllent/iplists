@@ -158,6 +158,13 @@ jobs:
           cat $RUNNER_TEMP/leakix.txt > lists/leakix.txt
         continue-on-error: true
 
+      - name: Linkedin Corporation
+        id: linkedin
+        run: |
+          ./iplists asn-ips AS13443 AS14413 AS55163 AS40793 AS202745 > $RUNNER_TEMP/linkedin.txt || exit 1
+          cat $RUNNER_TEMP/linkedin.txt > lists/linkedin.txt
+        continue-on-error: true
+
       - name: OpenAI # Source: https://platform.openai.com/docs/gptbot
         id: openai
         run: |
